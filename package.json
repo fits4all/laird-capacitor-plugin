@@ -1,7 +1,7 @@
 {
   "name": "laird-capacitor-plugin",
   "version": "0.0.1",
-  "description": "WIP",
+  "description": "A work in progress capacitor plugin that communicates with BLE laird devices.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",

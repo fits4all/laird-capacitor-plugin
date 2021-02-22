@@ -16,4 +16,22 @@ export class MainWeb extends WebPlugin implements MainPlugin {
         });
     }
 
+    async connectToDevice(): Promise<any> {
+        return new Promise<any>((_resolve, reject) => {
+            reject(new Error("Not implemented for web."));
+        });
+    }
+
+    async disconnectFromDevice(): Promise<any> {
+        return new Promise<any>((_resolve, reject) => {
+            reject(new Error("Not implemented for web."));
+        });
+    }
+
+    async sendDataToDevice(): Promise<any> {
+        return new Promise<any>((_resolve, reject) => {
+            reject(new Error("Not implemented for web."));
+        });
+    }
+
 }

@@ -1,6 +1,6 @@
 # laird-capacitor-plugin
 
-WIP
+A work in progress capacitor plugin that communicates with BLE laird devices.
 
 ## Install
 
@@ -13,8 +13,12 @@ npx cap sync
 
 <docgen-index>
 
-* [`startScanningDevices()`](#startscanningdevices)
-* [`stopScanningDevices()`](#stopscanningdevices)
+* [`startDiscovering()`](#startdiscovering)
+* [`cancelDiscovering()`](#canceldiscovering)
+* [`connectToDevice(...)`](#connecttodevice)
+* [`disconnectFromDevice()`](#disconnectfromdevice)
+* [`sendDataToDevice(...)`](#senddatatodevice)
+* [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 
@@ -23,26 +27,73 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### startScanningDevices()
+### startDiscovering()
 
 ```typescript
-startScanningDevices() => any
+startDiscovering() => any
 ```
 
-Start the scanning process for finding bluetooth devices.
+Start the discovering process for finding bluetooth devices.
 
 **Returns:** <code>any</code>
 
 --------------------
 
 
-### stopScanningDevices()
+### cancelDiscovering()
 
 ```typescript
-stopScanningDevices() => any
+cancelDiscovering() => any
 ```
 
-Stops the scanning process for finding bluetooth devices.
+Cancels the discovering process for finding bluetooth devices.
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### connectToDevice(...)
+
+```typescript
+connectToDevice(options: { address: string; }) => any
+```
+
+Connects to the specified device with the address.
+
+| Param         | Type                              |
+| ------------- | --------------------------------- |
+| **`options`** | <code>{ address: string; }</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### disconnectFromDevice()
+
+```typescript
+disconnectFromDevice() => any
+```
+
+Disconnects the current connected device.
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### sendDataToDevice(...)
+
+```typescript
+sendDataToDevice(options: { data: string; }) => any
+```
+
+Sends data to the connected device.
+
+| Param         | Type                           |
+| ------------- | ------------------------------ |
+| **`options`** | <code>{ data: string; }</code> |
 
 **Returns:** <code>any</code>
 
@@ -52,13 +103,33 @@ Stops the scanning process for finding bluetooth devices.
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'deviceFoundEvent', listenerFunc: (notification: { deviceName: string; deviceType: number; deviceAddress: string; }) => void) => Promise<PluginListenerHandle> & PluginListenerHandle
+addListener(eventName: 'deviceFoundEvent', callback: (ret: { name: string; type: number; address: string; }) => void) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
-| Param              | Type                                                                                                       |
-| ------------------ | ---------------------------------------------------------------------------------------------------------- |
-| **`eventName`**    | <code>"deviceFoundEvent"</code>                                                                            |
-| **`listenerFunc`** | <code>(notification: { deviceName: string; deviceType: number; deviceAddress: string; }) =&gt; void</code> |
+DeviceFoundListener
+
+| Param           | Type                                                                            | Description      |
+| --------------- | ------------------------------------------------------------------------------- | ---------------- |
+| **`eventName`** | <code>"deviceFoundEvent"</code>                                                 | DeviceFoundEvent |
+| **`callback`**  | <code>(ret: { name: string; type: number; address: string; }) =&gt; void</code> | Callback         |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'deviceRecvDataEvent', callback: (ret: { data: string; }) => void) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+DeviceRecvDataListener
+
+| Param           | Type                                             | Description         |
+| --------------- | ------------------------------------------------ | ------------------- |
+| **`eventName`** | <code>"deviceRecvDataEvent"</code>               | DeviceRecvDataEvent |
+| **`callback`**  | <code>(ret: { data: string; }) =&gt; void</code> | Callback            |
 
 **Returns:** <code>any</code>
 
