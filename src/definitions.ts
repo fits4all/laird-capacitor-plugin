@@ -3,17 +3,17 @@ import { PluginListenerHandle } from "@capacitor/core";
 export interface MainPlugin {
 
   /**
-   * Start the scanning process for finding bluetooth devices.
+   * Start the discovering process for finding bluetooth devices.
    */
-  startScanningDevices(): Promise<{ status: number, body: string }>;
+  startDiscovering(): Promise<any>
 
   /**
-   * Stops the scanning process for finding bluetooth devices.
+   * Cancels the discovering process for finding bluetooth devices.
    */
-  stopScanningDevices(): Promise<{ status: number, body: string }>;
+  cancelDiscovering(): Promise<any>
 
   /**
-   * 
+   * Add listener.
    */
   addListener(eventName: 'deviceFoundEvent', listenerFunc: (notification: { deviceName: string, deviceType: number, deviceAddress: string }) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
   

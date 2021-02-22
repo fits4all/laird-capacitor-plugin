@@ -4,15 +4,15 @@ import type { MainPlugin } from './definitions';
 
 export class MainWeb extends WebPlugin implements MainPlugin { 
 
-    async startScanningDevices(): Promise<any> {
+    async startDiscovering(): Promise<any> {
         return new Promise<any>((_resolve, reject) => {
-            reject(new Error("Not implemented yet!"));
+            reject(new Error("Not implemented for web."));
         });
     }
 
-    async stopScanningDevices(): Promise<{ status: number, body: string }> {
+    async cancelDiscovering(): Promise<any> {
         return new Promise<any>((_resolve, reject) => {
-            reject(new Error("Not implemented yet!"));
+            reject(new Error("Not implemented for web."));
         });
     }
 

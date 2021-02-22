@@ -16,6 +16,8 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 
+import nl.fits4all.laird.serial.BluetoothSerial;
+
 @CapacitorPlugin(
     name = "Main",
     permissions = {
@@ -37,106 +39,30 @@ import com.getcapacitor.annotation.Permission;
 )
 public class MainPlugin extends Plugin {
 
-    private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private boolean scanning = false;
+    private final BluetoothSerial serial = new BluetoothSerial();
 
     @Override
-    public void load() {
-        getActivity().registerReceiver(mBluetoothActionFound, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-        getActivity().registerReceiver(mBluetoothStartedScan, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
-        getActivity().registerReceiver(mBluetoothFinishedScan, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+    protected void handleOnStart() {
+        super.handleOnStart();
     }
 
-    /**
-     * Start the scanning process for finding bluetooth devices.
-     * @param call PluginCall
-     */
+    @Override
+    protected void handleOnDestroy() {
+        super.handleOnDestroy();
+    }
+
     @PluginMethod
-    public void startScanningDevices(final PluginCall call) {
-        if (scanning) {
-            JSObject ret = new JSObject();
-            ret.put("status", 1);
-            ret.put("body", "The bluetooth adapter is already scanning for bluetooth devices.");
-            call.resolve(ret);
-            return;
-        }
-
-        Log.i(null, "Starting scanning of bluetooth devices");
-
-        mBluetoothAdapter.startDiscovery();
-
-        JSObject ret = new JSObject();
-        ret.put("status", 0);
-        ret.put("body", "The bluetooth adapter has started scanning for bluetooth devices.");
-        call.resolve(ret);
+    public void startDiscovering(PluginCall call) {
+        Log.d(null, "Triggered method startDiscovering()");
+        serial.startDiscovering();
+        call.resolve();
     }
 
-    /**
-     * Stops the scanning process for finding bluetooth devices.
-     * @param call PluginCall
-     */
     @PluginMethod
-    public void stopScanningDevices(final PluginCall call) {
-        if (!scanning) {
-            JSObject ret = new JSObject();
-            ret.put("status", 1);
-            ret.put("body", "The bluetooth adapter is not scanning for bluetooth devices.");
-            call.resolve(ret);
-            return;
-        }
-
-        Log.i(null, "Stopping scanning of bluetooth devices");
-
-        mBluetoothAdapter.cancelDiscovery();
-        getActivity().unregisterReceiver(mBluetoothActionFound);
-        JSObject ret = new JSObject();
-        ret.put("status", 0);
-        ret.put("body", "The bluetooth adapter has stopped scanning for bluetooth devices.");
-        call.resolve(ret);
+    public void cancelDiscovering(PluginCall call) {
+        Log.d(null, "Triggered method cancelDiscovering()");
+        serial.cancelDiscovering();
+        call.resolve();
     }
-
-    /**
-     * Event for receiving bluetooth devices.
-     */
-    private final BroadcastReceiver mBluetoothActionFound = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                JSObject ret = new JSObject();
-                ret.put("deviceName", device.getName());
-                ret.put("deviceType", device.getType());
-                ret.put("deviceAddress", device.getAddress());
-                // ret.put("deviceAllias", device.getAlias());
-                Log.i(null, "Device found from scanning of bluetooth devices.");
-                Log.i(null, device.getName());
-                notifyListeners("deviceFoundEvent", ret);
-            }
-        }
-    };
-
-    /**
-     * Event for turning on.
-     */
-    private final BroadcastReceiver mBluetoothStartedScan = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                scanning = true;
-            }
-        }
-    };
-
-    /**
-     * Event for turning off.
-     */
-    private final BroadcastReceiver mBluetoothFinishedScan = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                scanning = false;
-            }
-        }
-    };
 
 }
