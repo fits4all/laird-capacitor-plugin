@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import nl.fits4all.laird.MainPlugin;
 
 public class BluetoothSerial {
 
@@ -36,19 +35,19 @@ public class BluetoothSerial {
         }
 
         if (activity != null) {
-            BroadcastReceiver mBluetoothActionFound = new BroadcastReceiver() {
+            activity.registerReceiver(new BroadcastReceiver() {
                 public void onReceive(Context context, Intent intent) {
                     String action = intent.getAction();
                     if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                        Log.d(TAG, "Device name: " + device.getName());
-                        Log.d(TAG, "Device type: " + device.getType());
-                        Log.d(TAG, "Device address: " + device.getAddress());
+                        assert device != null;
+                        if (device.getType() == BluetoothDevice.DEVICE_TYPE_LE && device.getName() != null) {
+                            Log.d(TAG, "Device name: " + device.getName());
+                            Log.d(TAG, "Device type: " + device.getType());
+                            Log.d(TAG, "Device address: " + device.getAddress());
+                        }
                     }
-                }
-            };
-
-            activity.registerReceiver(mBluetoothActionFound, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+                }}, new IntentFilter(BluetoothDevice.ACTION_FOUND));
             Log.d(TAG, "Initialized bluetooth action listeners.");
         }
     }
