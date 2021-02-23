@@ -12,56 +12,34 @@ import android.util.Log;
 
 import com.getcapacitor.JSObject;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import nl.fits4all.laird.LairdCapacitorPlugin;
+import nl.fits4all.laird.serial.bt.BluetoothAdapterHelper;
+import nl.fits4all.laird.serial.bt.BluetoothAdapterHelperCallback;
 
 
-public class BluetoothSerial extends BluetoothSerialManager {
+public class BluetoothSerial implements BluetoothAdapterHelperCallback {
 
     private final String TAG = this.getClass().getName();
 
-    private BluetoothAdapter bluetoothAdapter;
+    private final LairdCapacitorPlugin plugin;
+    private BluetoothAdapterHelper bluetoothAdapterHelper;
+    private BluetoothSerialManager bluetoothSerialManager;
     private final HashMap<String, BluetoothDevice> devices = new HashMap<>();
 
-    /**
-     * Constructor.
-     */
     public BluetoothSerial(LairdCapacitorPlugin plugin, Activity activity) {
-        super(plugin, activity);
+        this.plugin = plugin;
 
-        if (bluetoothAdapter == null) {
-            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapterHelper == null) {
+            bluetoothAdapterHelper = new BluetoothAdapterHelper(activity, this);
             Log.d(TAG, "Initialized bluetooth adapter.");
         }
 
-        if (activity != null) {
-            activity.registerReceiver(new BroadcastReceiver() {
-                public void onReceive(Context context, Intent intent) {
-                    String action = intent.getAction();
-                    if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                        BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                        if (device != null && device.getType() == BluetoothDevice.DEVICE_TYPE_LE) {
-                            if (device.getName() != null && !device.getName().startsWith("AE-")) {
-                                return;
-                            }
-                            devices.put(device.getAddress(), device);
-
-                            Log.d(TAG, "Bluetooth device found: ");
-                            Log.d(TAG, " - Device name: " + device.getName());
-                            Log.d(TAG, " - Device type: " + device.getType());
-                            Log.d(TAG, " - Device address: " + device.getAddress());
-
-                            JSObject js = new JSObject();
-                            js.put("name", device.getName());
-                            js.put("type", device.getType());
-                            js.put("address", device.getAddress());
-                            plugin.notifyCapacitorListeners("deviceFoundEvent", js);
-                        }
-                    }
-                }
-            }, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-            Log.d(TAG, "Initialized bluetooth action listeners.");
+        if (bluetoothSerialManager == null) {
+            bluetoothSerialManager = new BluetoothSerialManager(plugin, activity);
+            Log.d(TAG, "Initialized bluetooth manager.");
         }
     }
 
@@ -69,9 +47,9 @@ public class BluetoothSerial extends BluetoothSerialManager {
      * Starts the discovering process of finding devices.
      */
     public void startDiscovering() {
-        if (!bluetoothAdapter.isDiscovering()) {
+        if (!bluetoothAdapterHelper.isDiscovering()) {
             devices.clear(); // Clear list before discovering.
-            bluetoothAdapter.startDiscovery();
+            bluetoothAdapterHelper.startBleScan();
             Log.d(TAG, "Started discovering of bluetooth devices");
         } else {
             Log.d(TAG, "Could not start discovering bluetooth devices.");
@@ -82,8 +60,8 @@ public class BluetoothSerial extends BluetoothSerialManager {
      * Cancels the discovering process of finding devices.
      */
     public void cancelDiscovering() {
-        if (bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.cancelDiscovery();
+        if (bluetoothAdapterHelper.isDiscovering()) {
+            bluetoothAdapterHelper.stopBleScan();
             Log.d(TAG, "Canceled discovering of bluetooth devices");
         } else {
             Log.d(TAG, "Could not cancel discovering bluetooth devices.");
@@ -100,7 +78,7 @@ public class BluetoothSerial extends BluetoothSerialManager {
 
         if (device != null) {
             Log.d(TAG, "Connecting to bluetooth device.");
-            connect(device, autoConnect);
+            bluetoothSerialManager.connect(device, autoConnect);
         } else {
             Log.d(TAG, "Could not connect to bluetooth device. Device not found.");
         }
@@ -110,8 +88,8 @@ public class BluetoothSerial extends BluetoothSerialManager {
      * Disconnects the current connected device.
      */
     public void disconnect() {
-        if (getConnectionState() == BluetoothProfile.STATE_CONNECTED) {
-            disconnect();
+        if (bluetoothSerialManager.getConnectionState() == BluetoothProfile.STATE_CONNECTED) {
+            bluetoothSerialManager.disconnect();
         }
     }
 
@@ -119,8 +97,8 @@ public class BluetoothSerial extends BluetoothSerialManager {
      * Sends data to the bluetooth device.
      */
     public void sendData(String data) {
-        if (getConnectionState() == BluetoothProfile.STATE_CONNECTED) {
-            startDataTransfer(data);
+        if (bluetoothSerialManager.getConnectionState() == BluetoothProfile.STATE_CONNECTED) {
+            bluetoothSerialManager.startDataTransfer(data);
         }
     }
 
@@ -129,8 +107,28 @@ public class BluetoothSerial extends BluetoothSerialManager {
      * @return bluetoothAdapter
      */
     public BluetoothAdapter getBluetoothAdapter() {
-        return bluetoothAdapter;
+        return bluetoothAdapterHelper.getBluetoothAdapter();
     }
 
+    @Override
+    public void onBleStartScan() {
+        JSObject js = new JSObject();
+        plugin.notifyCapacitorListeners("discoveryStartEvent", js);
+    }
 
+    @Override
+    public void onBleStopScan() {
+        JSObject js = new JSObject();
+        plugin.notifyCapacitorListeners("discoveryStopEvent", js);
+    }
+
+    @Override
+    public void onBleDeviceFound(BluetoothDevice device, int rssi, byte[] scanRecord) {
+        JSObject js = new JSObject();
+        js.put("name", device.getName());
+        js.put("type", device.getType());
+        js.put("address", device.getAddress());
+        js.put("rssi", rssi);
+        plugin.notifyCapacitorListeners("deviceFoundEvent", js);
+    }
 }

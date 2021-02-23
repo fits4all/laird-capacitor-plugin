@@ -206,26 +206,6 @@ public class BluetoothAdapterHelper {
 	}
 
 	/**
-	 * initiates BT Classic scan operation. The scan time operation is 12
-	 * seconds. <br/>
-	 * The method
-	 * {@link BluetoothAdapterHelperCallback#onDiscoveryDeviceFound(BluetoothDevice, int)}
-	 * will be called when a device is found
-	 * 
-	 * @return true on success, false on error
-	 */
-	public boolean startDiscovery()	{
-		boolean discoveryInitiatedSuccessfully = mBluetoothAdapter
-				.startDiscovery();
-
-		if (discoveryInitiatedSuccessfully)	{
-			registerReceiver();
-		}
-
-		return discoveryInitiatedSuccessfully;
-	}
-
-	/**
 	 * Cancel the current device discovery process. <br>
 	 * Because discovery is a heavyweight procedure for the Bluetooth adapter,
 	 * this method should always be called before attempting to connect to a
@@ -269,6 +249,7 @@ public class BluetoothAdapterHelper {
 	public boolean startBleScan() {
 		boolean scanInitiatedSuccessfully = mBluetoothAdapter
 				.startLeScan(mLeScanCallback);
+		mBluetoothAdapterHelperCallback.onBleStartScan();
 
 		if (scanInitiatedSuccessfully) {
 			// scanning was initiated successfully
@@ -395,9 +376,9 @@ public class BluetoothAdapterHelper {
 			String action = intent.getAction();
 
 			if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-				// Leave empty.
+				// mBluetoothAdapterHelperCallback.onDiscoveryStart();
 			} else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))	{
-				mBluetoothAdapterHelperCallback.onDiscoveryStop();
+				// mBluetoothAdapterHelperCallback.onDiscoveryStop();
 				unregisterReceiver();
 			} else if (BluetoothDevice.ACTION_FOUND.equals(action))	{
 				// When discovery inquiry finds a device
@@ -407,8 +388,7 @@ public class BluetoothAdapterHelper {
 				BluetoothDevice device = intent
 						.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-				mBluetoothAdapterHelperCallback.onDiscoveryDeviceFound(device,
-						rssi);
+				// mBluetoothAdapterHelperCallback.onDiscoveryDeviceFound(device, rssi);
 			}
 		}
 	};

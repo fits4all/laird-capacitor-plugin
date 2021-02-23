@@ -11,20 +11,9 @@ import android.bluetooth.BluetoothDevice;
 public interface BluetoothAdapterHelperCallback {
 
 	/**
-	 * callback indicating that a BT classic scanning operation stopped
+	 * callback indicating that a BLE scanning operation stopped
 	 */
-	void onDiscoveryStop();
-
-	/**
-	 * Callback reporting a BT classic device found during a scan.
-	 * 
-	 * @param device
-	 *            Identifies the remote device
-	 * @param rssi
-	 *            The RSSI value for the remote device as reported by the
-	 *            Bluetooth hardware. 0 if no RSSI value is available.
-	 */
-	void onDiscoveryDeviceFound(BluetoothDevice device, int rssi);
+	void onBleStartScan();
 
 	/**
 	 * callback indicating that a BLE scanning operation stopped

@@ -20,6 +20,8 @@ npx cap sync
 * [`sendDataToDevice(...)`](#senddatatodevice)
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
+* [`addListener(...)`](#addlistener)
+* [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -103,15 +105,15 @@ Sends data to the connected device.
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'deviceFoundEvent', callback: (ret: { name: string; type: number; address: string; }) => void) => Promise<PluginListenerHandle> & PluginListenerHandle
+addListener(eventName: 'discoveryStartEvent', callback: () => void) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
-DeviceFoundListener
+DiscoveryStartEvent
 
-| Param           | Type                                                                            | Description      |
-| --------------- | ------------------------------------------------------------------------------- | ---------------- |
-| **`eventName`** | <code>"deviceFoundEvent"</code>                                                 | DeviceFoundEvent |
-| **`callback`**  | <code>(ret: { name: string; type: number; address: string; }) =&gt; void</code> | Callback         |
+| Param           | Type                               |
+| --------------- | ---------------------------------- |
+| **`eventName`** | <code>"discoveryStartEvent"</code> |
+| **`callback`**  | <code>() =&gt; void</code>         |
 
 **Returns:** <code>any</code>
 
@@ -121,15 +123,51 @@ DeviceFoundListener
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'deviceRecvDataEvent', callback: (ret: { data: string; }) => void) => Promise<PluginListenerHandle> & PluginListenerHandle
+addListener(eventName: 'discoveryStopEvent', callback: () => void) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+DiscoveryStopEvent
+
+| Param           | Type                              |
+| --------------- | --------------------------------- |
+| **`eventName`** | <code>"discoveryStopEvent"</code> |
+| **`callback`**  | <code>() =&gt; void</code>        |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'deviceFoundEvent', callback: (device: Device) => void) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+DeviceFoundListener
+
+| Param           | Type                                                           | Description      |
+| --------------- | -------------------------------------------------------------- | ---------------- |
+| **`eventName`** | <code>"deviceFoundEvent"</code>                                | DeviceFoundEvent |
+| **`callback`**  | <code>(device: <a href="#device">Device</a>) =&gt; void</code> | Callback         |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'deviceRecvDataEvent', callback: (data: DeviceData) => void) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
 DeviceRecvDataListener
 
-| Param           | Type                                             | Description         |
-| --------------- | ------------------------------------------------ | ------------------- |
-| **`eventName`** | <code>"deviceRecvDataEvent"</code>               | DeviceRecvDataEvent |
-| **`callback`**  | <code>(ret: { data: string; }) =&gt; void</code> | Callback            |
+| Param           | Type                                                                 | Description         |
+| --------------- | -------------------------------------------------------------------- | ------------------- |
+| **`eventName`** | <code>"deviceRecvDataEvent"</code>                                   | DeviceRecvDataEvent |
+| **`callback`**  | <code>(data: <a href="#devicedata">DeviceData</a>) =&gt; void</code> | Callback            |
 
 **Returns:** <code>any</code>
 
@@ -144,5 +182,22 @@ DeviceRecvDataListener
 | Prop         | Type                      |
 | ------------ | ------------------------- |
 | **`remove`** | <code>() =&gt; any</code> |
+
+
+#### Device
+
+| Prop          | Type                |
+| ------------- | ------------------- |
+| **`name`**    | <code>string</code> |
+| **`type`**    | <code>number</code> |
+| **`address`** | <code>string</code> |
+| **`rssi`**    | <code>number</code> |
+
+
+#### DeviceData
+
+| Prop       | Type                |
+| ---------- | ------------------- |
+| **`data`** | <code>string</code> |
 
 </docgen-api>
