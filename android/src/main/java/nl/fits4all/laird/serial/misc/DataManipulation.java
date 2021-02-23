@@ -5,9 +5,8 @@ import android.util.Log;
 /**
  * A wrapper that contains String manipulation logic
  */
-public class DataManipulation
-{
-	private final static String TAG = "DataManipulation";
+public class DataManipulation {
+	private final static String TAG = DataManipulation.class.getName();
 
 	/**
 	 * searches the given response string for a start and end string. if start
@@ -24,9 +23,7 @@ public class DataManipulation
 	 *         characters are not included). returns returns what is between the
 	 *         start and end string, else returns null
 	 */
-	public static String stripStringValue(String start, String end,
-			String response)
-	{
+	public static String stripStringValue(String start, String end,	String response) {
 		if (start == null || end == null)
 			throw new NullPointerException(
 					"start or end string parameter values passed is NULL");
@@ -34,16 +31,14 @@ public class DataManipulation
 		int startPos = response.indexOf(start);
 		int endPos = response.indexOf(end);
 
-		if (startPos != -1 || endPos != -1)
-		{
+		if (startPos != -1 || endPos != -1) {
 			Log.i(TAG, "stripStringValue response: " + response);
 			Log.i(TAG, "stripStringValue startPos+1: " + startPos + 1);
 			Log.i(TAG, "stripStringValue endPos: " + endPos);
-			Log.i(TAG,
-					"stripStringValue response.length(): " + response.length());
-
+			Log.i(TAG, "stripStringValue response.length(): " + response.length());
 			return response.substring(startPos + 1, endPos);
 		}
+
 		return null;
 	}
 
@@ -56,23 +51,18 @@ public class DataManipulation
 	 *            the data to be converted to HEX
 	 * @return hexChars the converted bytes in a HEX string format
 	 */
-	public static String bytesToHex(byte[] bytes)
-	{
-		if (bytes == null)
-			return null;
+	public static String bytesToHex(byte[] bytes) {
+		if (bytes == null) return null;
 
 		String result;
-
 		char[] hexChars = new char[bytes.length * 2];
-		for (int j = 0; j < bytes.length; j++)
-		{
+		for (int j = 0; j < bytes.length; j++) {
 			int v = bytes[j] & 0xFF;
 			hexChars[j * 2] = hexArray[v >>> 4];
 			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
 		}
 
 		result = new String(hexChars);
-
 		Log.i(TAG, "bytesToHex: " + result);
 		return result;
 	}

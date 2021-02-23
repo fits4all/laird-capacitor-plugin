@@ -22,415 +22,345 @@ import android.util.Log;
  * classic methods needed to initialise a BT classic remote device connection
  * and communications
  */
-public abstract class BaseBtClassicDeviceManager
-{
-	private final static String TAG = "BaseBtClassicDeviceManager";
-	private Activity mActivity;
+public abstract class BaseBtClassicDeviceManager {
+    private final static String TAG = BaseBtClassicDeviceManager.class.getName();
+    private Activity mActivity;
 
-	private BluetoothDevice mBluetoothDevice = null;
-	private ConnectThread mConnectThread;
-	private BluetoothSocket mBluetoothSocket;
-	private ConnectedThread mConnectedThread;
-	private boolean mIsConnecting = false;
-	private boolean mIsConnected = false;
+    private BluetoothDevice mBluetoothDevice = null;
+    private ConnectThread mConnectThread;
+    private BluetoothSocket mBluetoothSocket;
+    private ConnectedThread mConnectedThread;
+    private boolean mIsConnecting = false;
+    private boolean mIsConnected = false;
 
-	private InputStream mInputStream;
-	private OutputStream mOutputStream;
+    private InputStream mInputStream;
+    private OutputStream mOutputStream;
 
-	private UUID mUuidToConnectTo;
+    private UUID mUuidToConnectTo;
 
-	/**
-	 * @param activity
-	 * 		      activity object
-	 * @param bluetoothDevice
-	 *            the bluetooth device to associate this instance with
-	 * @param uuidToConnectTo
-	 *            the UUID to connect this remote device socket with
-	 */
-	public BaseBtClassicDeviceManager(Activity activity,
-			BluetoothDevice bluetoothDevice, UUID uuidToConnectTo)
-	{
-		if (activity == null || bluetoothDevice == null)
-			throw new NullPointerException(
-					"activity or bluetoothDevice parameter passed is null!");
+    /**
+     * @param activity        activity object
+     * @param bluetoothDevice the bluetooth device to associate this instance with
+     * @param uuidToConnectTo the UUID to connect this remote device socket with
+     */
+    public BaseBtClassicDeviceManager(Activity activity, BluetoothDevice bluetoothDevice, UUID uuidToConnectTo) {
+        if (activity == null || bluetoothDevice == null)
+            throw new NullPointerException("Activity or bluetooth device parameter passed is null!");
 
-		mActivity = activity;
-		mBluetoothDevice = bluetoothDevice;
-		mUuidToConnectTo = uuidToConnectTo;
-		mConnectThread = new ConnectThread();
+        mActivity = activity;
+        mBluetoothDevice = bluetoothDevice;
+        mUuidToConnectTo = uuidToConnectTo;
+        mConnectThread = new ConnectThread();
+    }
 
-	};
+    /**
+     * @param activity        activity object
+     * @param uuidToConnectTo the UUID to connect this remote device socket with
+     */
+    public BaseBtClassicDeviceManager(Activity activity, UUID uuidToConnectTo) {
+        if (activity == null) throw new NullPointerException("activity parameter passed is null!");
 
-	/**
-	 * @param activity
-	 *            activity object
-	 * @param uuidToConnectTo
-	 *            the UUID to connect this remote device socket with
-	 */
-	public BaseBtClassicDeviceManager(Activity activity, UUID uuidToConnectTo)
-	{
-		if (activity == null)
-			throw new NullPointerException("activity parameter passed is null!");
+        mActivity = activity;
+        mUuidToConnectTo = uuidToConnectTo;
+        mConnectThread = new ConnectThread();
+    }
 
-		mActivity = activity;
-		mUuidToConnectTo = uuidToConnectTo;
-		mConnectThread = new ConnectThread();
-	};
+    public boolean isConnecting() {
+        return mIsConnecting;
+    }
 
-	public boolean isConnecting()
-	{
-		return mIsConnecting;
-	}
+    public boolean isConnected() {
+        return mIsConnected;
+    }
 
-	public boolean isConnected()
-	{
-		return mIsConnected;
-	}
+    /**
+     * Connect to the remote BT Classic device
+     */
+    public void connect() {
+        if (mConnectThread == null)
+            throw new NullPointerException(
+                    "BluetoothSocket is not initialised!");
 
-	/**
-	 * Connect to the remote BT Classic device
-	 */
-	public void connect()
-	{
-		if (mConnectThread == null)
-			throw new NullPointerException(
-					"BluetoothSocket is not initialised!");
+        mIsConnecting = true;
+        mConnectThread.start();
+    }
 
-		mIsConnecting = true;
-		mConnectThread.start();
-	}
+    /**
+     * Will cancel an in-progress connection, and close the socket
+     */
+    public void disconnect() {
+        if (mConnectThread == null)
+            throw new NullPointerException("BluetoothSocket is not initialised!");
+        try {
+            unregisterReceiver();
+            mIsConnected = false;
+            mIsConnecting = false;
+            mBluetoothSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-	/** Will cancel an in-progress connection, and close the socket */
-	public void disconnect()
-	{
-		if (mConnectThread == null)
-			throw new NullPointerException(
-					"BluetoothSocket is not initialised!");
+        onBtClassicDisconnected();
+    }
 
-		try
-		{
-			unregisterReceiver();
-			mIsConnected = false;
-			mIsConnecting = false;
-			mBluetoothSocket.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+    /**
+     * Initiates listening of data from the connected remote BT Classic device.
+     * Whenever data is being retrieved the {@link #onBtClassicDataRead(byte[])}
+     * callback is called
+     */
+    public void startDataListeningFromRemoteDevice(int totalBytesToReadFromRemoteDevice) {
+        if (mConnectedThread == null)
+            throw new NullPointerException("Streams are not initialised!");
 
-		onBtClassicDisconnected();
-	}
+        if (isConnected()) {
+            mConnectedThread.startDataListeningFromRemoteDevice(totalBytesToReadFromRemoteDevice);
+        }
+    }
 
-	/**
-	 * Initiates listening of data from the connected remote BT Classic device.
-	 * Whenever data is being retrieved the {@link #onBtClassicDataRead(byte[])}
-	 * callback is called
-	 */
-	public void startDataListeningFromRemoteDevice(
-			int totalBytesToReadFromRemoteDevice)
-	{
-		if (mConnectedThread == null)
-			throw new NullPointerException("Streams are not initialised!");
+    /**
+     * Send data to the remote device
+     *
+     * @param bytes the data to send to the remote device
+     */
+    public void writeDataToRemoteDevice(byte[] bytes) {
+        if (mConnectedThread == null)
+            throw new NullPointerException("Streams are not initialised!");
 
-		if (isConnected())
-		{
-			mConnectedThread
-					.startDataListeningFromRemoteDevice(totalBytesToReadFromRemoteDevice);
-		}
-	}
+        try {
+            mOutputStream.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Send data to the remote device
-	 * 
-	 * @param bytes
-	 *            the data to send to the remote device
-	 */
-	public void writeDataToRemoteDevice(byte[] bytes)
-	{
-		if (mConnectedThread == null)
-			throw new NullPointerException("Streams are not initialised!");
+    /**
+     * Callback indicating success connection with the remote BT Classic device
+     */
+    public void onBtClassicConnected() {
+    }
 
-		try
-		{
-			mOutputStream.write(bytes);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
+    /**
+     * Callback indicating disconnection with the remote BT Classic device
+     */
+    public void onBtClassicDisconnected() {
+    }
 
-	/**
-	 * Callback indicating success connection with the remote BT Classic device
-	 */
-	public void onBtClassicConnected()
-	{}
+    /**
+     * Callback indicating that connection to the remote BT Classic device has
+     * failed
+     */
+    public void onBtClassicConnectFailed() {
+    }
 
-	/**
-	 * Callback indicating disconnection with the remote BT Classic device
-	 */
-	public void onBtClassicDisconnected()
-	{}
+    /**
+     * Callback for when data gets retrieved from the Connected remote BT
+     * Classic device. To start listening for data from the connected remote BT
+     * Classic device call the {@link #startDataListeningFromRemoteDevice(int)}
+     *
+     * @param buffer the data that was received
+     */
+    public void onBtClassicDataRead(byte[] buffer) {
 
-	/**
-	 * Callback indicating that connection to the remote BT Classic device has
-	 * failed
-	 */
-	public void onBtClassicConnectFailed()
-	{}
+    }
 
-	/**
-	 * Callback for when data gets retrieved from the Connected remote BT
-	 * Classic device. To start listening for data from the connected remote BT
-	 * Classic device call the {@link #startDataListeningFromRemoteDevice(int)}
-	 * 
-	 * @param buffer
-	 *            the data that was received
-	 */
-	public void onBtClassicDataRead(byte[] buffer)
-	{
+    /**
+     * the thread that is responsible for initiating a connection
+     */
+    private class ConnectThread extends Thread {
 
-	}
+        public ConnectThread() {
+            // Get a BluetoothSocket to connect with the given BluetoothDevice
+            try {
+                registerReceiver();
 
-	/**
-	 * the thread that is responsible for initiating a connection
-	 */
-	private class ConnectThread extends Thread
-	{
+                mBluetoothSocket = mBluetoothDevice
+                        .createRfcommSocketToServiceRecord(mUuidToConnectTo);
+            } catch (IOException e) {
+                onBtClassicConnectFailed();
+            }
+        }
 
-		public ConnectThread()
-		{
-			// Get a BluetoothSocket to connect with the given BluetoothDevice
-			try
-			{
-				registerReceiver();
+        @Override
+        public void run() {
+            try {
+                mIsConnected = false;
+                mIsConnecting = true;
 
-				mBluetoothSocket = mBluetoothDevice
-						.createRfcommSocketToServiceRecord(mUuidToConnectTo);
-			}
-			catch (IOException e)
-			{
-				onBtClassicConnectFailed();
-			}
-		}
+                /*
+                 * Connect the device through the socket. This will block until
+                 * it succeeds or throws an exception.
+                 */
+                mBluetoothSocket.connect();
 
-		@Override
-		public void run()
-		{
-			try
-			{
-				mIsConnected = false;
-				mIsConnecting = true;
+                /*
+                 * It didn't throw an exception so the broadcastReceiver will be
+                 * called notifying us that we have connected with the remote
+                 * device
+                 */
+            } catch (IOException connectException) {
+                // Unable to connect; close the socket and get out
+                try {
+                    mIsConnected = false;
+                    mIsConnecting = false;
 
-				/*
-				 * Connect the device through the socket. This will block until
-				 * it succeeds or throws an exception.
-				 */
-				mBluetoothSocket.connect();
-				/*
-				 * it didn't throw an exception so the broadcastReceiver will be
-				 * called notifying us that we have connected with the remote
-				 * device
-				 */
-			}
-			catch (IOException connectException)
-			{
-				// Unable to connect; close the socket and get out
-				try
-				{
-					mIsConnected = false;
-					mIsConnecting = false;
+                    mBluetoothSocket.close();
+                    onBtClassicConnectFailed();
+                } catch (IOException closeException) {
+                    onBtClassicConnectFailed();
+                }
+            }
+        }
+    }
 
-					mBluetoothSocket.close();
-					onBtClassicConnectFailed();
-				}
-				catch (IOException closeException)
-				{
-					onBtClassicConnectFailed();
-				}
-			}
-		}
-	}
+    /**
+     * thread for when we are connected and it's used for receiving and sending
+     * data from/to the remote device
+     */
+    private class ConnectedThread extends Thread {
+        byte[] mDataReadBuffer;
 
-	/**
-	 * thread for when we are connected and it's used for receiving and sending
-	 * data from/to the remote device
-	 */
-	private class ConnectedThread extends Thread
-	{
-		byte[] mDataReadBuffer;
+        public ConnectedThread() {
+            /*
+             * Get the input and output streams so that we can read incoming
+             * data and to write data to the remote device
+             */
+            try {
+                mInputStream = mBluetoothSocket.getInputStream();
+                mOutputStream = mBluetoothSocket.getOutputStream();
+            } catch (IOException ignored) {
+            }
+        }
 
-		public ConnectedThread()
-		{
-			/*
-			 * Get the input and output streams so that we can read incoming
-			 * data and to write data to the remote device
-			 */
-			try
-			{
-				mInputStream = mBluetoothSocket.getInputStream();
-				mOutputStream = mBluetoothSocket.getOutputStream();
-			}
-			catch (IOException ignored)
-			{}
-		}
+        /*
+         * Note: if the data received is more than our buffer size for when
+         * receiving data then data will get lost (non-Javadoc)
+         *
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {
+            // Keep listening to the InputStream until an exception occurs
+            while (true) {
+                try {
 
-		/*
-		 * Note: if the data received is more than our buffer size for when
-		 * receiving data then data will get lost (non-Javadoc)
-		 * 
-		 * @see java.lang.Thread#run()
-		 */
-		@Override
-		public void run()
-		{
-			// Keep listening to the InputStream until an exception occurs
-			while (true)
-			{
-				try
-				{
+                    int bytesRead; // bytes returned from read()
 
-					int bytesRead; // bytes returned from read()
+                    /*
+                     * The buffer might have extra data, if the data that was
+                     * sent from the remote device is less than the size of our
+                     * buffer then the buffer will have extra unneeded data.
+                     *
+                     * As we only want the data that was actually sent from the
+                     * remote device, we get the actual bytes that were read. In
+                     * this way we can use the bytesRead to go through the
+                     * buffer again and get only the data that was sent if
+                     * needed
+                     */
+                    bytesRead = mInputStream.read(mDataReadBuffer);
 
-					/*
-					 * The buffer might have extra data, if the data that was
-					 * sent from the remote device is less than the size of our
-					 * buffer then the buffer will have extra unneeded data.
-					 * 
-					 * As we only want the data that was actually sent from the
-					 * remote device, we get the actual bytes that were read. In
-					 * this way we can use the bytesRead to go through the
-					 * buffer again and get only the data that was sent if
-					 * needed
-					 */
-					bytesRead = mInputStream.read(mDataReadBuffer);
+                    /*
+                     * remove any extra empty data that might be in the buffer,
+                     * this might occur if the size of the buffer we defined is
+                     * larger than the data we received.
+                     */
+                    if (mDataReadBuffer.length > bytesRead) {
+                        // remove extra data
+                        ByteArrayInputStream bais = new ByteArrayInputStream(
+                                mDataReadBuffer);
+                        // buffer that has the exact size as the data we
+                        // actually need
+                        byte[] actualDataReadBuffer = new byte[bytesRead];
 
-					/*
-					 * remove any extra empty data that might be in the buffer,
-					 * this might occur if the size of the buffer we defined is
-					 * larger than the data we received.
-					 */
-					if (mDataReadBuffer.length > bytesRead)
-					{
-						// remove extra data
-						ByteArrayInputStream bais = new ByteArrayInputStream(
-								mDataReadBuffer);
-						// buffer that has the exact size as the data we
-						// actually need
-						byte[] actualDataReadBuffer = new byte[bytesRead];
+                        // store only the NOT extra data to the new buffer
+                        bais.read(actualDataReadBuffer);
+                        onBtClassicDataRead(actualDataReadBuffer);
+                    } else {
+                        // no extra data to remove
+                        onBtClassicDataRead(mDataReadBuffer);
+                    }
+                } catch (IOException e) {
+                    Log.i(TAG, "IOException: " + e);
+                    break;
+                }
+            }
+        }
 
-						// store only the NOT extra data to the new buffer
-						bais.read(actualDataReadBuffer);
-						onBtClassicDataRead(actualDataReadBuffer);
-					}
-					else
-					{
-						// no extra data to remove
-						onBtClassicDataRead(mDataReadBuffer);
-					}
-				}
-				catch (IOException e)
-				{
-					Log.i(TAG, "IOException: " + e);
-					break;
-				}
+        /**
+         * starts listening for data from the remote device. whenever data is
+         * received the callback
+         * {@link BaseBtClassicDeviceManager#onBtClassicDataRead(byte[])} is
+         * called with the data received.
+         * <p>
+         * if the totalBytesToReadFromRemoteDevice parameter is <=0 then the
+         * default value will be set and it will read 1024 bytes.
+         *
+         * @param totalBytesToReadFromRemoteDevice the total bytes to read every time we receive data
+         */
+        protected void startDataListeningFromRemoteDevice(
+                int totalBytesToReadFromRemoteDevice) {
 
-			}
+            if (totalBytesToReadFromRemoteDevice <= 0) {
+                /*
+                 * defines how many bytes to be read from the connected remote device
+                 * whenever data is received, default value is 1024 bytes
+                 */
+                int DEFAULT_TOTAL_BYTES_TO_READ_FROM_REMOTE_DEVICE = 1024;
+                mDataReadBuffer = new byte[DEFAULT_TOTAL_BYTES_TO_READ_FROM_REMOTE_DEVICE];
+            } else {
+                mDataReadBuffer = new byte[totalBytesToReadFromRemoteDevice];
+            }
 
-		}
+            start();
+        }
+    }
 
-		/**
-		 * starts listening for data from the remote device. whenever data is
-		 * received the callback
-		 * {@link BaseBtClassicDeviceManager#onBtClassicDataRead(byte[])} is
-		 * called with the data received.
-		 * 
-		 * if the totalBytesToReadFromRemoteDevice parameter is <=0 then the
-		 * default value will be set and it will read 1024 bytes.
-		 * 
-		 * @param totalBytesToReadFromRemoteDevice
-		 *            the total bytes to read every time we receive data
-		 */
-		protected void startDataListeningFromRemoteDevice(
-				int totalBytesToReadFromRemoteDevice)
-		{
+    /**
+     * Create a BroadcastReceiver for ACTION_FOUND callback for disconnect
+     * callback's
+     */
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                mIsConnecting = false;
+                mIsConnected = true;
 
-			if (totalBytesToReadFromRemoteDevice <= 0)
-			{
-				/*
-				 * defines how many bytes to be read from the connected remote device
-				 * whenever data is received, default value is 1024 bytes
-				 */
-				int DEFAULT_TOTAL_BYTES_TO_READ_FROM_REMOTE_DEVICE = 1024;
-				mDataReadBuffer = new byte[DEFAULT_TOTAL_BYTES_TO_READ_FROM_REMOTE_DEVICE];
-			}
-			else
-			{
-				mDataReadBuffer = new byte[totalBytesToReadFromRemoteDevice];
-			}
+                mConnectedThread = new ConnectedThread();
 
-			start();
-		}
-	}
+                /*
+                 * Connection and input/output streams are ready
+                 */
+                onBtClassicConnected();
 
-	/**
-	 * Create a BroadcastReceiver for ACTION_FOUND callback for disconnect
-	 * callback's
-	 */
-	private final BroadcastReceiver mReceiver = new BroadcastReceiver()
-	{
-		public void onReceive(Context context, Intent intent)
-		{
-			String action = intent.getAction();
-			if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action))
-			{
-				mIsConnecting = false;
-				mIsConnected = true;
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                try {
+                    mIsConnected = false;
+                    mIsConnecting = false;
+                    mBluetoothSocket.close();
 
-				mConnectedThread = new ConnectedThread();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-				/*
-				 * connection and input/output streams are ready
-				 */
-				onBtClassicConnected();
+                onBtClassicDisconnected();
+                unregisterReceiver();
+            }
+        }
+    };
 
-			}
-			else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action))
-			{
-				try
-				{
-					mIsConnected = false;
-					mIsConnecting = false;
-					mBluetoothSocket.close();
+    private void registerReceiver() {
+        // Register the BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
 
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
+        // Don't forget to unregister once we are done
+        mActivity.registerReceiver(mReceiver, filter);
+    }
 
-				onBtClassicDisconnected();
-				unregisterReceiver();
-			}
-		}
-	};
-
-	private void registerReceiver()
-	{
-		// Register the BroadcastReceiver
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-		filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-
-		// Don't forget to unregister once we are done
-		mActivity.registerReceiver(mReceiver, filter);
-	}
-
-	private void unregisterReceiver()
-	{
-		// unRegister the BroadcastReceiver
-		mActivity.unregisterReceiver(mReceiver);
-	}
+    private void unregisterReceiver() {
+        // unRegister the BroadcastReceiver
+        mActivity.unregisterReceiver(mReceiver);
+    }
 
 }

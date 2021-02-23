@@ -13,7 +13,7 @@ import android.util.Log;
 
 public class FileWrapper
 {
-	final private static String TAG = "FileWrapper";
+	final private static String TAG = FileWrapper.class.getName();
 
 	private File mFile;
 	private String mFilePath;
@@ -30,14 +30,12 @@ public class FileWrapper
 
 	private Context mContext;
 
-	public FileWrapper(Uri uri, Context context)
-	{
+	public FileWrapper(Uri uri, Context context) {
 		isEOF = false;
 		mUri = uri;
 		mContext = context;
 
-		if (mUri != null && mUri.getScheme().equals("content"))
-		{
+		if (mUri != null && mUri.getScheme().equals("content"))	{
 			/*
 			 * google drive files
 			 */
@@ -46,47 +44,28 @@ public class FileWrapper
 			c.moveToFirst();
 			int colCounter = c.getColumnCount();
 
-			for (int i = 0; i < colCounter; i++)
-			{
+			for (int i = 0; i < colCounter; i++) {
 
-				if ("_id".equals(c.getColumnName(i)))
-				{
-
+				if ("_id".equals(c.getColumnName(i))) {
+					// Not used atm.
 				}
-				else if ("document_id".equals(c.getColumnName(i)))
-				{
-
-				}
-				else if ("_display_name".equals(c.getColumnName(i)))
-				{
+				else if ("document_id".equals(c.getColumnName(i))) {
+					// Not used atm.
+				} else if ("_display_name".equals(c.getColumnName(i))) {
 					mFileName = c.getString(i);
-
-				}
-				else if ("_size".equals(c.getColumnName(i)))
-				{
+				} else if ("_size".equals(c.getColumnName(i))) {
 					mFileTotalSize = Integer.parseInt(c.getString(i));
-
-				}
-				else if ("_mime_type".equals(c.getColumnName(i)))
-				{
-
-				}
-				else if ("flags".equals(c.getColumnName(i)))
-				{
-
-				}
-				else if ("last_modified".equals(c.getColumnName(i)))
-				{
-
-				}
-				else if ("_icon".equals(c.getColumnName(i)))
-				{
-
+				} else if ("_mime_type".equals(c.getColumnName(i)))	{
+					// Not used atm.
+				} else if ("flags".equals(c.getColumnName(i))) {
+					// Not used atm.
+				} else if ("last_modified".equals(c.getColumnName(i))) {
+					// Not used atm.
+				} else if ("_icon".equals(c.getColumnName(i))) {
+					// Not used atm.
 				}
 			}
-		}
-		else
-		{
+		} else {
 			/*
 			 * other file and cloud based explorers
 			 */
@@ -102,73 +81,58 @@ public class FileWrapper
 		setModuleFileName();
 	}
 
-	public Uri getUri()
-	{
+	public Uri getUri() {
 		return mUri;
 	}
 
-	public File getFile()
-	{
+	public File getFile() {
 		return mFile;
 	}
 
-	public String getFilePath()
-	{
+	public String getFilePath() {
 		return mFilePath;
 	}
 
-	public String getFileName()
-	{
+	public String getFileName() {
 		return mFileName;
 	}
 
-	public String getFileNameWithoutExtension()
-	{
+	public String getFileNameWithoutExtension()	{
 		return mFileNameWithoutExtension;
 	}
 
-	public String getExtension()
-	{
+	public String getExtension() {
 		return mExtension;
 	}
 
-	public String getModuleFileName()
-	{
+	public String getModuleFileName() {
 		return mModuleFileName;
 	}
 
-	public long getFileTotalSize()
-	{
+	public long getFileTotalSize() {
 		return mFileTotalSize;
 	}
 
-	public long getFileCurrentSizeRead()
-	{
+	public long getFileCurrentSizeRead() {
 		return mFileCurrentSizeRead;
 	}
 
-	public boolean getIsEOF()
-	{
+	public boolean getIsEOF() {
 		return isEOF;
 	}
 
-	public FileInputStream getFileInputStream()
-	{
+	public FileInputStream getFileInputStream() {
 		return mFileInputStream;
 	}
 
 	/**
 	 * set the file name without an exception
 	 */
-	private void setFileNameWithoutExtension()
-	{
+	private void setFileNameWithoutExtension() {
 		int dotPosition = mFileName.lastIndexOf(".");
-		if (dotPosition != -1)
-		{
+		if (dotPosition != -1) {
 			mFileNameWithoutExtension = mFileName.substring(0, dotPosition);
-		}
-		else
-		{
+		} else {
 			mFileNameWithoutExtension = "";
 		}
 	}
@@ -176,16 +140,11 @@ public class FileWrapper
 	/**
 	 * sets the extension of the file.
 	 */
-	private void setExtension()
-	{
-		int dotposition = mFileName.lastIndexOf(".");
-		if (dotposition != -1)
-		{
-			mExtension = mFileName.substring(dotposition + 1,
-					mFileName.length());
-		}
-		else
-		{
+	private void setExtension() {
+		int dotPosition = mFileName.lastIndexOf(".");
+		if (dotPosition != -1) {
+			mExtension = mFileName.substring(dotPosition + 1);
+		} else {
 			mExtension = "";
 		}
 	}
@@ -193,30 +152,20 @@ public class FileWrapper
 	/**
 	 * defines what the filename of the file on the external device will be.
 	 */
-	private void setModuleFileName()
-	{
-
-		if (mExtension.equalsIgnoreCase("uwc"))
-		{
+	private void setModuleFileName() {
+		if (mExtension.equalsIgnoreCase("uwc")) {
 			// gets all the text found until the first occurrence of a dot "."
-			int firstDotposition = mFileName.indexOf(".");
-			if (firstDotposition != -1)
-			{
-
-				mModuleFileName = mFileName.substring(0, firstDotposition);
-			}
-			else
-			{
+			int firstDotPosition = mFileName.indexOf(".");
+			if (firstDotPosition != -1)	{
+				mModuleFileName = mFileName.substring(0, firstDotPosition);
+			} else {
 				mModuleFileName = "";
 			}
-		}
-		else
-		{
+		} else {
 			// not a .uwc extension so lets save this file on the device with
 			// it's full name
 			mModuleFileName = mFileName;
 		}
-
 	}
 
 	/**
@@ -225,13 +174,11 @@ public class FileWrapper
 	 * @param value
 	 *            the new value to set it to
 	 */
-	protected void setFileCurrentSizeRead(int value)
-	{
+	protected void setFileCurrentSizeRead(int value) {
 		mFileCurrentSizeRead = value;
 	}
 
-	protected void setIsEOF(boolean value)
-	{
+	protected void setIsEOF(boolean value) {
 		isEOF = value;
 	}
 
@@ -239,36 +186,25 @@ public class FileWrapper
 	 * sets to default the values of the current FileWrapper object. This should
 	 * be called whenever is needed to start reading the file from the start
 	 */
-	public void setToDefaultValues()
-	{
+	public void setToDefaultValues() {
 		mFileCurrentSizeRead = 0;
 		isEOF = false;
 
-		if (mFile != null)
-		{
+		if (mFile != null) {
 			Log.i(TAG, "Not a file from google drive");
 
-			try
-			{
+			try	{
 				mFileInputStream = new FileInputStream(mFile);
-			}
-			catch (FileNotFoundException e)
-			{
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-
-		}
-		else
-		{
+		} else {
 			Log.i(TAG, "A file from google drive");
 
-			try
-			{
+			try	{
 				mFileInputStream = (FileInputStream) mContext
 						.getContentResolver().openInputStream(mUri);
-			}
-			catch (FileNotFoundException e)
-			{
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 		}
@@ -282,17 +218,9 @@ public class FileWrapper
 	 *            the total bytes to read from the file
 	 * @return the data read as HEX string or null if EOF was reached
 	 */
-	public String readNextHEXStringFromFile(int totalBytesToRead)
-	{
-		String result = DataManipulation.bytesToHex(FileHandling
+	public String readNextHEXStringFromFile(int totalBytesToRead) {
+		return DataManipulation.bytesToHex(FileHandling
 				.readUntilTotalBytesToRead(this, totalBytesToRead));
-
-		System.out.println("*********************************");
-		Log.i(TAG, StringEscapeUtils
-				.escapeJava("*********************************"
-						+ "HEX Data that was just read from TXT: " + result));
-
-		return result;
 	}
 
 	/**
@@ -304,8 +232,7 @@ public class FileWrapper
 	 * @return the data from the file index started until and including the
 	 *         "readUntil" string
 	 */
-	public String readUntilASpecificChar(String readUntil)
-	{
+	public String readUntilASpecificChar(String readUntil) {
 		return FileHandling.readUntilASpecificChar(this, readUntil);
 	}
 }

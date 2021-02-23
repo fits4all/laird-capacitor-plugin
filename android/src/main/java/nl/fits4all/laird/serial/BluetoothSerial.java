@@ -14,24 +14,20 @@ import com.getcapacitor.JSObject;
 
 import java.util.HashMap;
 
-import nl.fits4all.laird.MainPlugin;
+import nl.fits4all.laird.LairdCapacitorPlugin;
 
 
 public class BluetoothSerial extends BluetoothSerialManager {
 
-    private final String TAG = "BluetoothSerial";
+    private final String TAG = this.getClass().getName();
 
     private BluetoothAdapter bluetoothAdapter;
-
-    public static final String DEVICE_NAME = "device_name";
-    public static final String TOAST = "toast";
-
     private final HashMap<String, BluetoothDevice> devices = new HashMap<>();
 
     /**
      * Constructor.
      */
-    public BluetoothSerial(MainPlugin plugin, Activity activity) {
+    public BluetoothSerial(LairdCapacitorPlugin plugin, Activity activity) {
         super(plugin, activity);
 
         if (bluetoothAdapter == null) {
@@ -51,7 +47,7 @@ public class BluetoothSerial extends BluetoothSerialManager {
                             }
                             devices.put(device.getAddress(), device);
 
-                            Log.d(TAG, "Bluetooth device found:");
+                            Log.d(TAG, "Bluetooth device found: ");
                             Log.d(TAG, " - Device name: " + device.getName());
                             Log.d(TAG, " - Device type: " + device.getType());
                             Log.d(TAG, " - Device address: " + device.getAddress());
@@ -76,9 +72,9 @@ public class BluetoothSerial extends BluetoothSerialManager {
         if (!bluetoothAdapter.isDiscovering()) {
             devices.clear(); // Clear list before discovering.
             bluetoothAdapter.startDiscovery();
-            Log.d(null, "Started discovering of bluetooth devices");
+            Log.d(TAG, "Started discovering of bluetooth devices");
         } else {
-            Log.d(null, "Could not start discovering bluetooth devices.");
+            Log.d(TAG, "Could not start discovering bluetooth devices.");
         }
     }
 
@@ -88,25 +84,25 @@ public class BluetoothSerial extends BluetoothSerialManager {
     public void cancelDiscovering() {
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
-            Log.d(null, "Canceled discovering of bluetooth devices");
+            Log.d(TAG, "Canceled discovering of bluetooth devices");
         } else {
-            Log.d(null, "Could not cancel discovering bluetooth devices.");
+            Log.d(TAG, "Could not cancel discovering bluetooth devices.");
         }
     }
 
     /**
      * Connects to the address that was discovered.
      * @param address Address of discovered device.
-     * @param secure Security.
+     * @param autoConnect AutoConnect of discovered device.
      */
-    public void connect(String address, boolean secure) {
+    public void connect(String address, boolean autoConnect) {
         BluetoothDevice device = devices.get(address);
 
         if (device != null) {
-            Log.d(null, "Connecting to bluetooth device.");
-            connect(device, secure);
+            Log.d(TAG, "Connecting to bluetooth device.");
+            connect(device, autoConnect);
         } else {
-            Log.d(null, "Could not connect to bluetooth device. Device not found.");
+            Log.d(TAG, "Could not connect to bluetooth device. Device not found.");
         }
     }
 
@@ -126,6 +122,14 @@ public class BluetoothSerial extends BluetoothSerialManager {
         if (getConnectionState() == BluetoothProfile.STATE_CONNECTED) {
             startDataTransfer(data);
         }
+    }
+
+    /**
+     * Gets the bluetooth adapter.
+     * @return bluetoothAdapter
+     */
+    public BluetoothAdapter getBluetoothAdapter() {
+        return bluetoothAdapter;
     }
 
 

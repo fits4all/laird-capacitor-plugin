@@ -1,6 +1,6 @@
-# laird-capacitor-plugin
+# Laird Capacitor Plugin
 
-A work in progress capacitor plugin that communicates with BLE laird devices.
+A work in progress capacitor plugin that communicates with bluetooth laird devices.
 
 ## Install
 

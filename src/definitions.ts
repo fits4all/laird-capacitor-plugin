@@ -1,6 +1,6 @@
 import { PluginListenerHandle } from "@capacitor/core";
 
-export interface MainPlugin {
+export interface LairdCapacitorPlugin {
 
   /**
    * Start the discovering process for finding bluetooth devices.

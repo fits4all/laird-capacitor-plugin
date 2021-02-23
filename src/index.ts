@@ -1,10 +1,10 @@
 import { registerPlugin } from '@capacitor/core';
 
-import type { MainPlugin } from './definitions';
+import type { LairdCapacitorPlugin } from './definitions';
 
-const Main = registerPlugin<MainPlugin>('Main', {
-  web: () => import('./web').then(m => new m.MainWeb()),
+const Laird = registerPlugin<LairdCapacitorPlugin>('Laird', {
+  web: () => import('./web').then(m => new m.LairdCapacitorWeb()),
 });
 
 export * from './definitions';
-export { Main };
+export { Laird };

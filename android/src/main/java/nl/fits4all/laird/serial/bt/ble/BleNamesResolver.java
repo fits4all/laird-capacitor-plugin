@@ -23,31 +23,28 @@ public abstract class BleNamesResolver {
     private static SparseArray<String> mAppearance = new SparseArray<String>();
     private static SparseArray<String> mHeartRateSensorLocation = new SparseArray<String>();
 
-    static public String resolveServiceName(final String uuid)
-    {
+    static public String resolveServiceName(final String uuid) {
         String result = mServices.get(uuid);
-        if(result == null) result = "Unknown Service";
+        if (result == null) result = "Unknown Service";
         return result;
     }
 
-    static public String resolveValueTypeDescription(final int format)
-    {
+    static public String resolveValueTypeDescription(final int format) {
         return mValueFormats.get(format, "Unknown Format");
     }
-    
-    static public String resolveCharacteristicName(final String uuid)
-    {
+
+    static public String resolveCharacteristicName(final String uuid) {
         String result = mCharacteristics.get(uuid);
-        if(result == null) result = "Unknown Characteristic";
+        if (result == null) result = "Unknown Characteristic";
         return result;
     }
 
     static public String resolveUuid(final String uuid) {
         String result = mServices.get(uuid);
-        if(result != null) return "Service: " + result;
+        if (result != null) return "Service: " + result;
 
         result = mCharacteristics.get(uuid);
-        if(result != null) return "Characteristic: " + result;
+        if (result != null) return "Characteristic: " + result;
 
         result = "Unknown UUID";
         return result;
@@ -55,12 +52,12 @@ public abstract class BleNamesResolver {
 
     static public String resolveAppearance(int key) {
         Integer tmp = Integer.valueOf(key);
-        return mAppearance.get(tmp, "Unknown Appearance");		
+        return mAppearance.get(tmp, "Unknown Appearance");
     }
 
     static public String resolveHeartRateSensorLocation(int key) {
         Integer tmp = Integer.valueOf(key);
-        return mHeartRateSensorLocation.get(tmp, "Other");		
+        return mHeartRateSensorLocation.get(tmp, "Other");
     }
 
     static public boolean isService(final String uuid) {
@@ -69,7 +66,7 @@ public abstract class BleNamesResolver {
 
     static public boolean isCharacteristic(final String uuid) {
         return mCharacteristics.containsKey(uuid);
-    }	
+    }
 
     static {
 //        mServices.put("569a1101-b87f-490c-92cb-11ba5ea5167c", "Laird Virtual Serial Port Service");

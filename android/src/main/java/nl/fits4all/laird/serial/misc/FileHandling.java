@@ -2,6 +2,7 @@ package nl.fits4all.laird.serial.misc;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -13,7 +14,7 @@ import android.util.Log;
  */
 public abstract class FileHandling
 {
-	final public static String TAG = "FileHandling";
+	private static final String TAG = FileHandling.class.getName();
 
 	/**
 	 * reads from the file as many bytes as specified in the totalBytesToRead
@@ -26,38 +27,30 @@ public abstract class FileHandling
 	 * @return the data read as HEX string or null if EOF was reached
 	 */
 	public static byte[] readUntilTotalBytesToRead(FileWrapper fileWrapper,
-			int totalBytesToRead)
-	{
+			int totalBytesToRead) {
 		FileInputStream is = fileWrapper.getFileInputStream();
 		int fileEnd = 0;
 		byte[] bFile = new byte[(int) totalBytesToRead];
 
-		try
-		{
-
+		try	{
 			fileEnd = is.read(bFile, 0, (int) totalBytesToRead);
 
-			if (fileEnd == -1)
-			{
-				// EOF
+			if (fileEnd == -1) {
+				// End of file.
 				is.close();
 				fileWrapper.setIsEOF(true);
 				Log.i(TAG, "isFileFinishedRead TRUE");
 				return null;
-			}
-			else
-			{
+			} else {
 				fileWrapper.setFileCurrentSizeRead((int) (fileWrapper
 						.getFileCurrentSizeRead() + totalBytesToRead));
 			}
 		}
-		catch (Exception e)
-		{
+		catch (Exception e)	{
 			e.printStackTrace();
 		}
 
-		Log.i(TAG, "readUntilTotalBytesToRead bFile: " + bFile);
-
+		Log.i(TAG, "readUntilTotalBytesToRead bFile: " + Arrays.toString(bFile));
 		return bFile;
 	}
 
@@ -74,65 +67,50 @@ public abstract class FileHandling
 	 *         "readUntil" string, returns null when EOF
 	 */
 	public static String readUntilASpecificChar(FileWrapper fileWrapper,
-			String readUntil)
-	{
+			String readUntil) {
 		FileInputStream is = fileWrapper.getFileInputStream();
 		StringBuilder result = new StringBuilder();
 		int charAsInteger = 0;
 		char ch = 0;
 
-		if (fileWrapper.getIsEOF())
-		{
+		if (fileWrapper.getIsEOF())	{
 			return null;
 		}
 
-		try
-		{
-			while (true)
-			{
+		try	{
+			while (true) {
 				charAsInteger = is.read();
-
-				if (charAsInteger == -1)
-				{
+				if (charAsInteger == -1) {
 					// EOF
 					Log.i(TAG, "isFileFinishedRead TRUE");
 
 					is.close();
 					fileWrapper.setIsEOF(true);
 
-					if (result.length() > 0)
-					{
+					if (result.length() > 0) {
 						return result.toString();
-					}
-					else
-					{
+					} else {
 						return null;
 					}
-				}
-				else
-				{
+				} else {
 					ch = (char) charAsInteger;
 					result.append(ch);
 					// updated the total bytes read whenever we read 1 byte
 					fileWrapper.setFileCurrentSizeRead((int) (fileWrapper
 							.getFileCurrentSizeRead() + 1));
 
-					if ((result.toString().contains(readUntil)))
-					{
+					if ((result.toString().contains(readUntil))) {
 						break;
 					}
 				}
 			}
 
-			System.out.println("*********************************");
 			Log.i(TAG, StringEscapeUtils
 					.escapeJava("Data that was just read from TXT: " + result));
 
 			return result.toString();
 
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -143,10 +121,8 @@ public abstract class FileHandling
 	 * 
 	 * @return the file size or -1 if file is not found
 	 */
-	public static long getFileSize(File file)
-	{
-		if (!file.exists() || !file.isFile())
-		{
+	public static long getFileSize(File file) {
+		if (!file.exists() || !file.isFile()) {
 			System.out.println("File doesn't exist");
 			return -1;
 		}

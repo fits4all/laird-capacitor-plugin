@@ -1,8 +1,8 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { MainPlugin } from './definitions';
+import type { LairdCapacitorPlugin } from './definitions';
 
-export class MainWeb extends WebPlugin implements MainPlugin { 
+export class LairdCapacitorWeb extends WebPlugin implements LairdCapacitorPlugin { 
 
     async startDiscovering(): Promise<any> {
         return new Promise<any>((_resolve, reject) => {

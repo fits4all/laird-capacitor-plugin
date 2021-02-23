@@ -23,18 +23,16 @@ import android.util.Log;
 
 /**
  * This class is a wrapper for the Android BluetoothAdapter class
- * <p>
+ *
  * Responsible for:
- * <ul>
- * <li>initialising the local Bluetooth hardware</li>
- * <li>Checking if BT and BLE hardware is currently enabled</li>
- * <li>Checking if BLE central and/or peripheral modes are supported</li>
- * <li>Scanning for BT Classic and BLE device</li>
- * </ul>
+ * - Initialising the local Bluetooth hardware</li>
+ * - Checking if BT and BLE hardware is currently enabled</li>
+ * - Checking if BLE central and/or peripheral modes are supported.
+ * - Scanning for BT Classic and BLE device.
+ *
  */
-public class BluetoothAdapterHelper
-{
-	private final static String TAG = "BluetoothAdapterHelper";
+public class BluetoothAdapterHelper {
+	private final static String TAG = BluetoothAdapterHelper.class.getName();
 
 	protected Activity mActivity;
 	private static BluetoothAdapter mBluetoothAdapter;
@@ -65,8 +63,7 @@ public class BluetoothAdapterHelper
 	 * @param bluetoothAdapterHelperCallback Class to give callbacks to.
 	 */
 	public BluetoothAdapterHelper(Activity activity,
-			BluetoothAdapterHelperCallback bluetoothAdapterHelperCallback)
-	{
+			BluetoothAdapterHelperCallback bluetoothAdapterHelperCallback) {
 		if (activity == null || bluetoothAdapterHelperCallback == null)
 			throw new NullPointerException(
 					"Activity or BluetoothAdapterHelperCallback object passed is NULL");
@@ -74,18 +71,14 @@ public class BluetoothAdapterHelper
 		mActivity = activity;
 		mBluetoothAdapterHelperCallback = bluetoothAdapterHelperCallback;
 
-		if (!initialise())
-			throw new NullPointerException(
-					"BT adapter could not be initialised");
+		if (!initialise()) throw new NullPointerException("BT adapter could not be initialised");
 	}
 
-	public BluetoothManager getBluetoothManager()
-	{
+	public BluetoothManager getBluetoothManager() {
 		return mBluetoothManager;
 	}
 
-	public BluetoothAdapter getBluetoothAdapter()
-	{
+	public BluetoothAdapter getBluetoothAdapter() {
 		return mBluetoothAdapter;
 	}
 
@@ -95,8 +88,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return true if discovering
 	 */
-	public boolean isDiscovering()
-	{
+	public boolean isDiscovering() {
 		return getBluetoothAdapter().isDiscovering();
 	}
 
@@ -105,8 +97,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return true if scanning
 	 */
-	public boolean isBleScanning()
-	{
+	public boolean isBleScanning() {
 		return mIsBleScanning;
 	}
 
@@ -116,8 +107,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return the BLE scan timeout
 	 */
-	public long getBleScanTimeout()
-	{
+	public long getBleScanTimeout() {
 		return BLE_SCAN_TIMEOUT;
 	}
 
@@ -127,8 +117,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return the interval time
 	 */
-	public long getBleScanPeriodicalInterval()
-	{
+	public long getBleScanPeriodicalInterval() {
 		return BLE_SCAN_PERIODICAL_INTERVAL;
 	}
 
@@ -139,8 +128,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @param scanTimeout Scan timeout
 	 */
-	public void setBleScanTimeout(long scanTimeout)
-	{
+	public void setBleScanTimeout(long scanTimeout)	{
 		BLE_SCAN_TIMEOUT = scanTimeout;
 	}
 
@@ -151,8 +139,7 @@ public class BluetoothAdapterHelper
 	 * @param scanPeriodicalInterval
 	 *            the time to set the interval to
 	 */
-	public void setBleScanPeriodicalInterval(long scanPeriodicalInterval)
-	{
+	public void setBleScanPeriodicalInterval(long scanPeriodicalInterval) {
 		BLE_SCAN_PERIODICAL_INTERVAL = scanPeriodicalInterval;
 	}
 
@@ -169,8 +156,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return boolean false if not currently enabled, true otherwise.
 	 */
-	public boolean isEnabled()
-	{
+	public boolean isEnabled() {
 		return mBluetoothAdapter.isEnabled();
 	}
 
@@ -179,8 +165,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return boolean false if BT classic is not supported, otherwise true
 	 */
-	public boolean checkBtClassicSupport()
-	{
+	public boolean checkBtClassicSupport() {
 		boolean hasBt = mActivity.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_BLUETOOTH);
 
@@ -194,8 +179,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return boolean false if BLE hardware is not available, otherwise true
 	 */
-	public boolean checkBleCentralSupport()
-	{
+	public boolean checkBleCentralSupport() {
 		boolean hasBle = mActivity.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_BLUETOOTH_LE);
 
@@ -210,8 +194,7 @@ public class BluetoothAdapterHelper
 	 * @return true if supports peripheral mode, false otherwise
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public boolean checkBlePeripheralSupport()
-	{
+	public boolean checkBlePeripheralSupport() {
 		boolean hasPeripheral = false;
 
 		hasPeripheral = mBluetoothAdapter
@@ -231,13 +214,11 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return true on success, false on error
 	 */
-	public boolean startDiscovery()
-	{
+	public boolean startDiscovery()	{
 		boolean discoveryInitiatedSuccessfully = mBluetoothAdapter
 				.startDiscovery();
 
-		if (discoveryInitiatedSuccessfully)
-		{
+		if (discoveryInitiatedSuccessfully)	{
 			registerReceiver();
 		}
 
@@ -252,8 +233,7 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return true on success, false on error
 	 */
-	public boolean stopDiscovery()
-	{
+	public boolean stopDiscovery() {
 		return mBluetoothAdapter.cancelDiscovery();
 	}
 
@@ -263,10 +243,8 @@ public class BluetoothAdapterHelper
 	 * this method or when the timeout of the BLE scanning operation runs out
 	 */
 	@SuppressWarnings("deprecation")
-	public void stopBleScan()
-	{
-		if (isBleScanning())
-		{
+	public void stopBleScan() {
+		if (isBleScanning()) {
 			getBluetoothAdapter().stopLeScan(mLeScanCallback);
 			mIsBleScanning = false;
 			mIsBleScanningPeriodically = false;
@@ -274,9 +252,7 @@ public class BluetoothAdapterHelper
 			mBleScanTimeout.removeCallbacksAndMessages(null);
 			mBleScanPeriodicalTimeout.removeCallbacksAndMessages(null);
 			mBluetoothAdapterHelperCallback.onBleStopScan();
-		}
-		else
-		{
+		} else {
 			Log.i(TAG, "BLE Scanning has already been stopped!");
 		}
 	}
@@ -290,13 +266,11 @@ public class BluetoothAdapterHelper
 	 * @return true, if the scan was started successfully
 	 */
 	@SuppressWarnings("deprecation")
-	public boolean startBleScan()
-	{
+	public boolean startBleScan() {
 		boolean scanInitiatedSuccessfully = mBluetoothAdapter
 				.startLeScan(mLeScanCallback);
 
-		if (scanInitiatedSuccessfully)
-		{
+		if (scanInitiatedSuccessfully) {
 			// scanning was initiated successfully
 			mIsBleScanning = true;
 			bleStopScanTimeout();
@@ -312,31 +286,27 @@ public class BluetoothAdapterHelper
 	 * the {@link #stopBleScan()} method is called or when the BLE_SCANN_TIMEOUT
 	 * runs out
 	 * 
-	 * @param serviceUuids
+	 * @param serviceUUIDs
 	 *            the services UUIDs to search BLE devices, Make sure that the
 	 *            BLE device is actually advertising the UUIDs looking for in
 	 *            it's advertisement data
 	 * @return true, if the scan was started successfully, otherwise false
 	 */
 	@SuppressWarnings("deprecation")
-	public boolean startBleScan(final UUID[] serviceUuids)
-	{
-		mSearchForDevicesWithSpecificUuidServices = serviceUuids;
+	public boolean startBleScan(final UUID[] serviceUUIDs) {
+		mSearchForDevicesWithSpecificUuidServices = serviceUUIDs;
 		mIsFilterFoundDevices = true;
 
 		boolean scanInitiatedSuccessfully = mBluetoothAdapter
 				.startLeScan(mLeScanCallback);
 
-		if (scanInitiatedSuccessfully)
-		{
+		if (scanInitiatedSuccessfully) {
 			Log.i(TAG, "Scan for devices with specific UUIDs");
 
 			// scanning was initiated successfully
 			mIsBleScanning = true;
 			bleStopScanTimeout();
-		}
-		else
-		{
+		} else {
 			mIsFilterFoundDevices = false;
 			mSearchForDevicesWithSpecificUuidServices = null;
 		}
@@ -354,12 +324,10 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return true, if the scan was started successfully, otherwise false
 	 */
-	public boolean startBleScanPeriodically()
-	{
+	public boolean startBleScanPeriodically() {
 		boolean scanInitiatedSuccessfully = startBleScan();
 
-		if (scanInitiatedSuccessfully)
-		{
+		if (scanInitiatedSuccessfully) {
 			// scan was initiated successfully
 			Log.i(TAG, "Scan for BLE devices periodically");
 			bleStartScanPeriodically();
@@ -378,19 +346,17 @@ public class BluetoothAdapterHelper
 	 * called when the {@link #stopBleScan()} method is called or when the
 	 * BLE_SCAN_TIMEOUT runs out
 	 * 
-	 * @param serviceUuids
+	 * @param serviceUUIDs
 	 *            the services UUIDs to search BLE devices
 	 * @return true, if the scan was started successfully, otherwise false
 	 */
-	public boolean startBleScanPeriodically(final UUID[] serviceUuids)
-	{
-		boolean scanInitiatedSuccessfully = startBleScan(serviceUuids);
+	public boolean startBleScanPeriodically(final UUID[] serviceUUIDs) {
+		boolean scanInitiatedSuccessfully = startBleScan(serviceUUIDs);
 
-		if (scanInitiatedSuccessfully)
-		{
-			// scan was initiated successfully
+		if (scanInitiatedSuccessfully) {
+			// Scan was initiated successfully
 			Log.i(TAG, "Scan for BLE devices with specific UUIDs periodically");
-			bleStartScanPeriodically(serviceUuids);
+			bleStartScanPeriodically(serviceUUIDs);
 		}
 
 		return scanInitiatedSuccessfully;
@@ -398,7 +364,7 @@ public class BluetoothAdapterHelper
 
 	/**
 	 * Initialise local Bluetooth hardware.
-	 * <p>
+	 *
 	 * BluetoothAdapter must be initialised successfully before doing any
 	 * start/stop scanning operations.
 	 * 
@@ -406,14 +372,10 @@ public class BluetoothAdapterHelper
 	 *         hardware, otherwise returns true.
 	 */
 	@SuppressLint("NewApi")
-	private boolean initialise()
-	{
-		if (mBluetoothManager == null)
-		{
-			mBluetoothManager = (BluetoothManager) mActivity
-					.getSystemService(Context.BLUETOOTH_SERVICE);
-			if (mBluetoothManager == null)
-			{
+	private boolean initialise() {
+		if (mBluetoothManager == null) {
+			mBluetoothManager = (BluetoothManager) mActivity.getSystemService(Context.BLUETOOTH_SERVICE);
+			if (mBluetoothManager == null)	{
 				return false;
 			}
 		}
@@ -428,23 +390,16 @@ public class BluetoothAdapterHelper
 	 * Create a BroadcastReceiver for ACTION_FOUND callback for discovery
 	 * operations (Bluetooth classic and BLE devices scanning)
 	 */
-	private final BroadcastReceiver mReceiver = new BroadcastReceiver()
-	{
-		public void onReceive(Context context, Intent intent)
-		{
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 
-			if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
-			{
+			if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
 				// Leave empty.
-			}
-			else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
-			{
+			} else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))	{
 				mBluetoothAdapterHelperCallback.onDiscoveryStop();
 				unregisterReceiver();
-			}
-			else if (BluetoothDevice.ACTION_FOUND.equals(action))
-			{
+			} else if (BluetoothDevice.ACTION_FOUND.equals(action))	{
 				// When discovery inquiry finds a device
 				// Get the BluetoothDevice object from the Intent
 				int rssi = intent.getShortExtra(
@@ -458,8 +413,7 @@ public class BluetoothAdapterHelper
 		}
 	};
 
-	private void registerReceiver()
-	{
+	private void registerReceiver() {
 		// Register the BroadcastReceiver
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -470,8 +424,7 @@ public class BluetoothAdapterHelper
 		mActivity.registerReceiver(mReceiver, filter);
 	}
 
-	private void unregisterReceiver()
-	{
+	private void unregisterReceiver() {
 		// unRegister the BroadcastReceiver
 		mActivity.unregisterReceiver(mReceiver);
 	}
@@ -479,35 +432,29 @@ public class BluetoothAdapterHelper
 	/**
 	 * defines callback for BLE scanning results
 	 */
-	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback()
-	{
+	private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 		@Override
 		// comes from: startLeScan
 		public void onLeScan(final BluetoothDevice device, final int rssi,
-				final byte[] scanRecord)
-		{
+				final byte[] scanRecord) {
 			Log.i(TAG, "A BLE device was found");
 
-			if (!mIsFilterFoundDevices)
-			{
+			if (!mIsFilterFoundDevices)	{
 				/*
 				 * currently doing an all BLE devices scan
 				 */
 				mBluetoothAdapterHelperCallback.onBleDeviceFound(device, rssi,
 						scanRecord);
-			}
-			else
-			{
+			} else {
 				/*
 				 * doing a specific service UUIDs BLE devices scan
 				 */
 				// get the service's UUIDs that the remote device is advertising
-				List<UUID> deviceAdvertisedServices = parseUuids(scanRecord);
+				List<UUID> deviceAdvertisedServices = parseUUIDs(scanRecord);
 
 				// displaying to console the UUIDs that are advertised in the
 				// advertise data of the remote BLE device
-				for (UUID currentUuidFromDevice : deviceAdvertisedServices)
-				{
+				for (UUID currentUuidFromDevice : deviceAdvertisedServices)	{
 					Log.i(TAG,
 							"UUID advertised by remote device without connecting: "
 									+ currentUuidFromDevice);
@@ -531,16 +478,10 @@ public class BluetoothAdapterHelper
 	/**
 	 * stops BLE scan operation after a pre-defined scan period.
 	 */
-	private void bleStopScanTimeout()
-	{
-		mBleScanTimeout.postDelayed(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				Log.i(TAG, "stopBleScan after timeout of BLE scanning");
-				stopBleScan();
-			}
+	private void bleStopScanTimeout() {
+		mBleScanTimeout.postDelayed(() -> {
+			Log.i(TAG, "stopBleScan after timeout of BLE scanning");
+			stopBleScan();
 		}, BLE_SCAN_TIMEOUT);
 	}
 
@@ -556,29 +497,21 @@ public class BluetoothAdapterHelper
 	 * called when the {@link #stopBleScan()} method is called or when the
 	 * BLE_SCAN_TIMEOUT runs out
 	 */
-	private void bleStartScanPeriodically()
-	{
+	private void bleStartScanPeriodically() {
 		mIsBleScanningPeriodically = true;
 		/*
-		 * stop scanning and then after BLE_SCAN_PERIODICAL_INTERVAL start BLE
+		 * Stop scanning and then after BLE_SCAN_PERIODICAL_INTERVAL start BLE
 		 * scanning
 		 */
-		mBleScanPeriodicalTimeout.postDelayed(new Runnable()
-		{
-			@SuppressWarnings("deprecation")
-			@Override
-			public void run()
-			{
-				mBluetoothAdapter.stopLeScan(mLeScanCallback);
+		mBleScanPeriodicalTimeout.postDelayed(() -> {
+			mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
-				// while this is true it will continue starting the BLE scan
-				// the mIsBleScanningPeriodically becomes false when the
-				// BLE_SCAN_TIMEOUT runs out
-				if (mIsBleScanningPeriodically)
-				{
-					mBluetoothAdapter.startLeScan(mLeScanCallback);
-					bleStartScanPeriodically();
-				}
+			// while this is true it will continue starting the BLE scan
+			// the mIsBleScanningPeriodically becomes false when the
+			// BLE_SCAN_TIMEOUT runs out
+			if (mIsBleScanningPeriodically)	{
+				mBluetoothAdapter.startLeScan(mLeScanCallback);
+				bleStartScanPeriodically();
 			}
 		}, BLE_SCAN_PERIODICAL_INTERVAL);
 	}
@@ -591,32 +524,23 @@ public class BluetoothAdapterHelper
 	 * As long as the mIsBleScanningPeriodically is true then this method will
 	 * be called recursively.
 	 */
-	private void bleStartScanPeriodically(final UUID[] serviceUuids)
-	{
+	private void bleStartScanPeriodically(final UUID[] serviceUuids) {
 		mIsBleScanningPeriodically = true;
 		/*
-		 * stop scanning and then after
+		 * Stop scanning and then after
 		 * BLE_SCANNING_PERIODICALLY_INTERVAL_TIMEOUT start BLE scanning
 		 */
-		mBleScanPeriodicalTimeout.postDelayed(new Runnable()
-		{
-			@SuppressWarnings("deprecation")
-			@Override
-			public void run()
-			{
-				getBluetoothAdapter().stopLeScan(mLeScanCallback);
+		mBleScanPeriodicalTimeout.postDelayed(() -> {
+			getBluetoothAdapter().stopLeScan(mLeScanCallback);
 
-				/*
-				 * while this is true it will continue starting the BLE scan.
-				 * the mIsBleScanPeriodically becomes false when the
-				 * BLE_SCANNING_TIMEOUT runs out
-				 */
-				if (mIsBleScanningPeriodically)
-				{
-					mBluetoothAdapter
-							.startLeScan(serviceUuids, mLeScanCallback);
-					bleStartScanPeriodically(serviceUuids);
-				}
+			/*
+			 * while this is true it will continue starting the BLE scan.
+			 * the mIsBleScanPeriodically becomes false when the
+			 * BLE_SCANNING_TIMEOUT runs out
+			 */
+			if (mIsBleScanningPeriodically)	{
+				mBluetoothAdapter.startLeScan(serviceUuids, mLeScanCallback);
+				bleStartScanPeriodically(serviceUuids);
 			}
 		}, BLE_SCAN_PERIODICAL_INTERVAL);
 	}
@@ -629,49 +553,41 @@ public class BluetoothAdapterHelper
 	 * 
 	 * @return the list of found UUIDs that are in the advertised data
 	 */
-	private List<UUID> parseUuids(byte[] advertisedData)
-	{
-		List<UUID> uuids = new ArrayList<>();
+	private List<UUID> parseUUIDs(byte[] advertisedData) {
+		List<UUID> UUIDs = new ArrayList<>();
 
 		ByteBuffer buffer = ByteBuffer.wrap(advertisedData).order(
 				ByteOrder.LITTLE_ENDIAN);
-		while (buffer.remaining() > 2)
-		{
+		while (buffer.remaining() > 2) {
 			byte length = buffer.get();
-			if (length == 0)
-				break;
+			if (length == 0) break;
 
 			byte type = buffer.get();
-			switch (type)
-			{
-			case 0x02: // Partial list of 16-bit UUIDs
-			case 0x03: // Complete list of 16-bit UUIDs
-				while (length >= 2)
-				{
-					uuids.add(UUID.fromString(String.format(
-							"%08x-0000-1000-8000-00805f9b34fb",
-							buffer.getShort())));
-					length -= 2;
-				}
-				break;
-
-			case 0x06: // Partial list of 128-bit UUIDs
-			case 0x07: // Complete list of 128-bit UUIDs
-				while (length >= 16)
-				{
-					long lsb = buffer.getLong();
-					long msb = buffer.getLong();
-					uuids.add(new UUID(msb, lsb));
-					length -= 16;
-				}
-				break;
-
-			default:
-				buffer.position(buffer.position() + length - 1);
-				break;
+			switch (type) {
+				case 0x02: // Partial list of 16-bit UUIDs
+				case 0x03: // Complete list of 16-bit UUIDs
+					while (length >= 2)	{
+						UUIDs.add(UUID.fromString(String.format(
+								"%08x-0000-1000-8000-00805f9b34fb",
+								buffer.getShort())));
+						length -= 2;
+					}
+					break;
+				case 0x06: // Partial list of 128-bit UUIDs
+				case 0x07: // Complete list of 128-bit UUIDs
+					while (length >= 16) {
+						long lsb = buffer.getLong();
+						long msb = buffer.getLong();
+						UUIDs.add(new UUID(msb, lsb));
+						length -= 16;
+					}
+					break;
+				default:
+					buffer.position(buffer.position() + length - 1);
+					break;
 			}
 		}
 
-		return uuids;
+		return UUIDs;
 	}
 }

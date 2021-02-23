@@ -8,8 +8,7 @@ import android.bluetooth.BluetoothDevice;
  * Scanning/Stopping and finding BT classic and BLE devices callback's.
  * implement this interface in the class that you want to get this callback's.
  */
-public interface BluetoothAdapterHelperCallback
-{
+public interface BluetoothAdapterHelperCallback {
 
 	/**
 	 * callback indicating that a BT classic scanning operation stopped

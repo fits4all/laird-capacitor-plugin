@@ -3,19 +3,18 @@ package nl.fits4all.laird.serial;
 import android.app.Activity;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.util.Log;
 
 import com.getcapacitor.JSObject;
 
-import nl.fits4all.laird.MainPlugin;
+import nl.fits4all.laird.LairdCapacitorPlugin;
 import nl.fits4all.laird.serial.bt.ble.vsp.VirtualSerialPortDevice;
 
 public class BluetoothSerialManager extends VirtualSerialPortDevice
 {
 
-    private final MainPlugin plugin;
+    private final LairdCapacitorPlugin plugin;
 
-    public BluetoothSerialManager(MainPlugin plugin, Activity activity)
+    public BluetoothSerialManager(LairdCapacitorPlugin plugin, Activity activity)
     {
         super(activity);
         this.plugin = plugin;

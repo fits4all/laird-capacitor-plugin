@@ -9,22 +9,19 @@ import android.util.Log;
  * Used by the VSP functionalities to store the data that is receiving and the
  * data that will be sending
  */
-public class FifoQueue
-{
-	private static final String TAG = "FifoQueue";
+public class FifoQueue {
+	private static final String TAG = FifoQueue.class.getName();
 
 	private StringBuilder mBufferData = new StringBuilder();
 
-	public int getSize()
-	{
+	public int getSize() {
 		return mBufferData.length();
 	}
 
 	/**
 	 * clears the whole buffer
 	 */
-	public void flush()
-	{
+	public void flush() {
 		mBufferData.delete(0, mBufferData.length());
 	}
 
@@ -35,8 +32,7 @@ public class FifoQueue
 	 * @param value
 	 *            the data to be appended in the buffer
 	 */
-	public void write(String value)
-	{
+	public void write(String value)	{
 		mBufferData.append(value);
 	}
 
@@ -47,14 +43,11 @@ public class FifoQueue
 	 *            the object to store the data read
 	 * @return the total number of characters read
 	 */
-	public int read(StringBuilder dest)
-	{
-		if (mBufferData.length() > 0)
-		{
+	public int read(StringBuilder dest)	{
+		if (mBufferData.length() > 0) {
 			// we have data in the buffer
 			dest.append(mBufferData.substring(0, mBufferData.length()));
 			mBufferData.delete(0, mBufferData.length());
-
 			return dest.length();
 		}
 
@@ -73,13 +66,9 @@ public class FifoQueue
 	 *            the maximum data to read from the buffer
 	 * @return the total number of characters read
 	 */
-	public int read(StringBuilder dest, int maxDataToBeReadFromBuffer)
-	{
-		Log.i(TAG, "reading " + maxDataToBeReadFromBuffer
-				+ " bytes from the FIFO queue");
-
-		if (mBufferData.length() <= maxDataToBeReadFromBuffer)
-		{
+	public int read(StringBuilder dest, int maxDataToBeReadFromBuffer)	{
+		Log.i(TAG, "reading " + maxDataToBeReadFromBuffer	+ " bytes from the FIFO queue");
+		if (mBufferData.length() <= maxDataToBeReadFromBuffer) {
 			/*
 			 * ignore the mMaxDataToBeReadFromBuffer variable and return the
 			 * last data remaining from the buffer
@@ -87,9 +76,7 @@ public class FifoQueue
 			dest.append(mBufferData.substring(0, mBufferData.length()));
 			mBufferData.delete(0, mBufferData.length());
 			return dest.length();
-		}
-		else if (mBufferData.length() > maxDataToBeReadFromBuffer)
-		{
+		} else if (mBufferData.length() > maxDataToBeReadFromBuffer) {
 			/*
 			 * return data from the buffer until the mMaxDataToBeReadFromBuffer
 			 */
@@ -114,15 +101,13 @@ public class FifoQueue
 	 *            the string to search the buffer for
 	 * @return the total number of characters read
 	 */
-	public int read(StringBuilder dest, String searchFor)
-	{
+	public int read(StringBuilder dest, String searchFor) {
 		Log.i(TAG, "reading from the FIFO queue until the character '"
 				+ StringEscapeUtils.escapeJava(searchFor) + "' is found");
 
 		int stringToSearchForIndex = mBufferData.indexOf(searchFor);
 
-		if (stringToSearchForIndex != -1)
-		{
+		if (stringToSearchForIndex != -1) {
 			dest.append(mBufferData.substring(0, stringToSearchForIndex + 1));
 			mBufferData.delete(0, stringToSearchForIndex + 1);
 			return dest.length();

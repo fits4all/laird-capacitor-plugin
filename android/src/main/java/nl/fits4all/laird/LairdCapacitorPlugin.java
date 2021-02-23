@@ -1,45 +1,31 @@
 package nl.fits4all.laird;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.util.Log;
 
 import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
-
-import org.json.JSONException;
+import com.getcapacitor.annotation.PermissionCallback;
 
 import nl.fits4all.laird.serial.BluetoothSerial;
 
 @CapacitorPlugin(
-    name = "Main",
+    name = "Laird",
     permissions = {
         @Permission(
             alias = "location",
             strings = {
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION // Android 10+
-            }
-        ),
-        @Permission(
-            alias = "bluetooth",
-            strings = {
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN
             }
         )
     }
 )
-public class MainPlugin extends Plugin {
+public class LairdCapacitorPlugin extends Plugin {
 
     private BluetoothSerial serial;
 
@@ -55,15 +41,59 @@ public class MainPlugin extends Plugin {
         super.handleOnDestroy();
     }
 
+    /**
+     * Checks if location permission was granted to the application.
+     * After this is done, a permission callback is triggered.
+     *
+     * {@link #requestDiscovering(PluginCall)}
+     *
+     * @param call PluginCall
+     */
     @PluginMethod
     public void startDiscovering(PluginCall call) {
         Log.d(null, "Triggered method startDiscovering()");
+
+        if (getPermissionState("location") != PermissionState.GRANTED) {
+            requestAllPermissions(call, "requestDiscovering");
+        } else {
+            requestDiscovering(call);
+        }
+    }
+
+
+    /**
+     * Starts the discovering process if location permissions were granted.
+     * Also checks if bluetooth is currently enabled. If both these are granted
+     * and enabled, then the plugin will start discovering bluetooth devices in
+     * range of the host device.
+     *
+     * @param call PluginCall.
+     */
+    @PermissionCallback
+    public void requestDiscovering(PluginCall call) {
+        Log.d(null, "Triggered permission callback requestDiscovering()");
+
+        if (getPermissionState("location") != PermissionState.GRANTED) {
+            call.reject("Location permission was denied.");
+            return;
+        }
+
+        if (serial.getBluetoothAdapter() == null || !serial.getBluetoothAdapter().isEnabled()) {
+            call.reject("Bluetooth is not enabled.");
+            return;
+        }
+
         serial.startDiscovering();
         JSObject js = new JSObject();
         js.put("status", "Discovering has started.");
         call.resolve(js);
     }
 
+    /**
+     * Cancels the discovering process.
+     *
+     * @param call PluginCall.
+     */
     @PluginMethod
     public void cancelDiscovering(PluginCall call) {
         Log.d(null, "Triggered method cancelDiscovering()");
@@ -73,6 +103,12 @@ public class MainPlugin extends Plugin {
         call.resolve(js);
     }
 
+    /**
+     * Connects to the specified target bluetooth device. A address parameter
+     * must be specified to start the connection with the bluetooth device.
+     *
+     * @param call PluginCall
+     */
     @PluginMethod
     public void connectToDevice(PluginCall call) {
         Log.d(null, "Triggered method connectToDevice()");
@@ -88,6 +124,11 @@ public class MainPlugin extends Plugin {
         call.resolve(js);
     }
 
+    /**
+     * Disconnects the current connected bluetooth device.
+     *
+     * @param call PluginCall
+     */
     @PluginMethod
     public void disconnectFromDevice(PluginCall call) {
         Log.d(null, "Triggered method disconnectFromDevice()");
@@ -98,6 +139,13 @@ public class MainPlugin extends Plugin {
         call.resolve(js);
     }
 
+    /**
+     * Sends the current connected bluetooth device data. A data
+     * parameter must be specified to start sending data to the bluetooth
+     * device.
+     *
+     * @param call PluginCall
+     */
     @PluginMethod
     public void sendDataToDevice(PluginCall call) {
         Log.d(null, "Triggered method sendDataToDevice()");
@@ -114,7 +162,9 @@ public class MainPlugin extends Plugin {
     }
 
     /**
-     * Notifies capacitors event listeners.
+     * Notifies capacitors event listeners. We wrap this because it's protected
+     * and we want to use it in other classes to trigger custom events.
+     *
      * @param eventName EventName
      * @param js Javascript Object
      */
