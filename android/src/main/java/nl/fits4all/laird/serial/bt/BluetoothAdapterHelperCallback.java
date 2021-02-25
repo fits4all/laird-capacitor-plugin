@@ -1,7 +1,5 @@
 package nl.fits4all.laird.serial.bt;
 
-import java.util.UUID;
-
 import android.bluetooth.BluetoothDevice;
 
 /**
@@ -11,22 +9,17 @@ import android.bluetooth.BluetoothDevice;
 public interface BluetoothAdapterHelperCallback {
 
 	/**
-	 * callback indicating that a BLE scanning operation stopped
+	 * Callback that is indicating that a BLE scanning process has started.
 	 */
 	void onBleStartScan();
 
 	/**
-	 * callback indicating that a BLE scanning operation stopped
+	 * Callback that is indicating that a BLE scanning process has stopped.
 	 */
 	void onBleStopScan();
 
 	/**
-	 * Callback reporting a BLE device found during a scan that was initiated by
-	 * the <br>
-	 * {@link BluetoothAdapterHelper#startBleScan()} or <br>
-	 * {@link BluetoothAdapterHelper#startBleScan(UUID[])} or <br>
-	 * {@link BluetoothAdapterHelper#startBleScanPeriodically()} or <br>
-	 * {@link BluetoothAdapterHelper#startBleScanPeriodically(UUID[])}
+	 * Callback reporting a BLE device found during a scan that was initiated.
 	 * 
 	 * @param device
 	 *            Identifies the remote device
@@ -34,9 +27,7 @@ public interface BluetoothAdapterHelperCallback {
 	 *            The RSSI value for the remote device as reported by the
 	 *            Bluetooth hardware. 0 if no RSSI value is available.
 	 * @param scanRecord
-	 *            The content of the advertisement record offered by the remote
-	 *            device.
+	 * 			  Used the check UUIDs of a device for verification.
 	 */
-	void onBleDeviceFound(BluetoothDevice device, int rssi,
-			byte[] scanRecord);
+	void onBleDeviceFound(BluetoothDevice device, int rssi,	byte[] scanRecord);
 }

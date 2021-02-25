@@ -4,8 +4,9 @@ export interface LairdCapacitorPlugin {
 
   /**
    * Start the discovering process for finding bluetooth devices.
+   * @param Options
    */
-  startDiscovering(): Promise<any>
+  startDiscovering(options: { periodically: boolean }): Promise<any>
 
   /**
    * Cancels the discovering process for finding bluetooth devices.

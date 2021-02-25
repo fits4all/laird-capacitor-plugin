@@ -46,11 +46,16 @@ public class BluetoothSerial implements BluetoothAdapterHelperCallback {
     /**
      * Starts the discovering process of finding devices.
      */
-    public void startDiscovering() {
+    public void startDiscovering(boolean periodically) {
         if (!bluetoothAdapterHelper.isDiscovering()) {
             devices.clear(); // Clear list before discovering.
-            bluetoothAdapterHelper.startBleScan();
-            Log.d(TAG, "Started discovering of bluetooth devices");
+            if (periodically) {
+                bluetoothAdapterHelper.startBleScanPeriodically();
+                Log.d(TAG, "Started discovering of bluetooth devices periodically.");
+            } else {
+                bluetoothAdapterHelper.startBleScan();
+                Log.d(TAG, "Started discovering of bluetooth devices.");
+            }
         } else {
             Log.d(TAG, "Could not start discovering bluetooth devices.");
         }

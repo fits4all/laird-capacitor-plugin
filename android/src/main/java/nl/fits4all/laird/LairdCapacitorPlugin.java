@@ -83,7 +83,12 @@ public class LairdCapacitorPlugin extends Plugin {
             return;
         }
 
-        serial.startDiscovering();
+        if (!call.getData().has("periodically")) {
+            call.reject("Did not specify periodically parameter.");
+            return;
+        }
+
+        serial.startDiscovering(call.getBoolean("periodically"));
         JSObject js = new JSObject();
         js.put("status", "Discovering has started.");
         call.resolve(js);
