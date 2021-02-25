@@ -10,6 +10,21 @@ npm install laird-capacitor-plugin
 npx cap sync
 ```
 
+## Example
+```typescript
+// Import Laird and Device.
+import { Laird, Device } from 'laird-capacitor-plugin';
+
+// Initialize the listener first.
+Laird.addListener("deviceFoundEvent", (device) => {
+    console.log(device);
+});
+
+// Start discovering.
+Laird.startDiscovering({ periodically: true });
+```
+
+
 ## API
 
 <docgen-index>
