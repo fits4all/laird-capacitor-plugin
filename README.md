@@ -1,6 +1,7 @@
 # Laird Capacitor Plugin
 
-A work in progress capacitor plugin that communicates with bluetooth laird devices.
+A Capacitor plugin that communicates with bluetooth low energy laird devices.
+Supports older devices with the BluetoothAdapter and newer devices uses the BluetoothLeScanner.
 
 ## Install
 
@@ -13,7 +14,7 @@ npx cap sync
 
 <docgen-index>
 
-* [`startDiscovering()`](#startdiscovering)
+* [`startDiscovering(...)`](#startdiscovering)
 * [`cancelDiscovering()`](#canceldiscovering)
 * [`connectToDevice(...)`](#connecttodevice)
 * [`disconnectFromDevice()`](#disconnectfromdevice)
@@ -29,13 +30,17 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### startDiscovering()
+### startDiscovering(...)
 
 ```typescript
-startDiscovering() => any
+startDiscovering(options: { periodically: boolean; }) => any
 ```
 
 Start the discovering process for finding bluetooth devices.
+
+| Param         | Type                                    |
+| ------------- | --------------------------------------- |
+| **`options`** | <code>{ periodically: boolean; }</code> |
 
 **Returns:** <code>any</code>
 
