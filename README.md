@@ -48,7 +48,7 @@ Laird.startDiscovering({ periodically: true });
 ### startDiscovering(...)
 
 ```typescript
-startDiscovering(options: { periodically: boolean; }) => any
+startDiscovering(options?: { periodically: boolean; } | undefined) => any
 ```
 
 Start the discovering process for finding bluetooth devices.

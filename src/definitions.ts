@@ -6,7 +6,7 @@ export interface LairdCapacitorPlugin {
    * Start the discovering process for finding bluetooth devices.
    * @param Options
    */
-  startDiscovering(options: { periodically: boolean }): Promise<any>
+  startDiscovering(options?: { periodically: boolean }): Promise<{ status: number, message: string }>
 
   /**
    * Cancels the discovering process for finding bluetooth devices.
@@ -17,7 +17,7 @@ export interface LairdCapacitorPlugin {
    * Connects to the specified device with the address.
    * @param Options
    */
-  connectToDevice(options: {address: string}): Promise<{ status: string }>
+  connectToDevice(options: { address: string }): Promise<{ status: string }>
 
   /**
    * Disconnects the current connected device.
@@ -29,7 +29,7 @@ export interface LairdCapacitorPlugin {
    * Sends data to the connected device.
    * @param Options 
    */
-  sendDataToDevice(options: {data: string}): Promise<{ status: string}>
+  sendDataToDevice(options: { data: string }): Promise<{ status: string}>
 
   /**
    * DiscoveryStartEvent

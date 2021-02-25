@@ -74,23 +74,27 @@ public class LairdCapacitorPlugin extends Plugin {
         Log.d(null, "Triggered permission callback requestDiscovering()");
 
         if (getPermissionState("location") != PermissionState.GRANTED) {
-            call.reject("Location permission was denied.");
+            JSObject js = new JSObject();
+            js.put("status", 0);
+            js.put("message", "ERROR_LOCATION_PERMISSION_DENIED");
+            call.resolve(js);
             return;
         }
 
         if (serial.getBluetoothAdapter() == null || !serial.getBluetoothAdapter().isEnabled()) {
-            call.reject("Bluetooth is not enabled.");
+            JSObject js = new JSObject();
+            js.put("status", 0);
+            js.put("message", "ERROR_BLUETOOTH_DISABLED");
+            call.resolve(js);
             return;
         }
 
-        if (!call.getData().has("periodically")) {
-            call.reject("Did not specify periodically parameter.");
-            return;
-        }
-
-        serial.startDiscovering(call.getBoolean("periodically"));
+        // IDE can't check.
+        // noinspection ConstantConditions
+        serial.startDiscovering(call.getBoolean("periodically", true));
         JSObject js = new JSObject();
-        js.put("status", "Discovering has started.");
+        js.put("status", 1);
+        js.put("message", "SUCCESS_DISCOVERY_STARTED");
         call.resolve(js);
     }
 
