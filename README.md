@@ -1,4 +1,5 @@
 # Laird Capacitor Plugin
+This plugin is still in development and is not live on NPM yet!
 
 A Capacitor plugin that communicates with bluetooth low energy laird devices.
 Supports older devices with the BluetoothAdapter and newer devices uses the BluetoothLeScanner.
